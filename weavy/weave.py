@@ -29,7 +29,7 @@ class BaseWeaver(object):
         """
         res = []
         # TODO: optimize this
-        # TODO: adhere conditions!
+        # TODO: adhere conditions (composition & rewuirements)
         # TODO: add filter function to eliminate non valid weaves upfront.
 
         # 1. find possible mappings

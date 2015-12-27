@@ -1,0 +1,32 @@
+{
+  "directed": true, 
+  "graph": {}, 
+  "nodes": [
+    {
+      "score": 0, 
+      "type": "x", 
+      "id": "k"
+    }, 
+    {
+      "score": 0, 
+      "type": "z", 
+      "id": "m"
+    }, 
+    {
+      "score": 0, 
+      "type": "y", 
+      "id": "l"
+    }
+  ], 
+  "links": [
+    {
+      "source": 0, 
+      "target": 2
+    }, 
+    {
+      "source": 2, 
+      "target": 1
+    }
+  ], 
+  "multigraph": false
+}

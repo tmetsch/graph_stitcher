@@ -3,6 +3,8 @@
 import matplotlib.pyplot as plt
 import networkx as nx
 
+# TODO: display inital request & landscape. autoscale subplots
+
 
 def show(landscapes, new_nodes, results, prog='neato', size=(2, 4)):
     """

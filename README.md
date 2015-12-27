@@ -45,13 +45,13 @@ different algorithms on how to determine if a resulting landscape is good
 
 This tool obviously can also be used to enhance the placement of workload after
 a scheduling decision has been made (based on round-robin, preemptive,
-priority, fair share, fifo, ... algorithms) within HPC/Cloud/Grid cluster.
+priority, fair share, fifo, ... algorithms) within HPC/Cloud/Grid clusters.
 
 ## graph weaver's internals
 
 As mentioned above graph weaver is pluggable to test different algorithms of
 weaving/validating two graphs together. Hence it has a pluggable interface for
-the *weave()* and *validate* function (see BaseWeaver class).
+the *weave()* and *validate()* function (see BaseWeaver class).
 
 To weave two graphs it needs to know how and which relationships are needed:
 

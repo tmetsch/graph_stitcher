@@ -14,6 +14,8 @@ def main():
     request_tmp = json.load(open('data/request.json'))
     request = json_graph.node_link_graph(request_tmp, directed=True)
 
+
+    # TODO: allow for chaining of validators & weavers
     # XXX: change this to whatever weaver you want to use
     in_weaver = weave.IncomingEdgeWeaver()
     # score_weaver = weave.NodeScoreWeaver()

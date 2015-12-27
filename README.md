@@ -25,7 +25,7 @@ score.
 
 Hence **weaving** two graph together is done by adding relationships (edges)
 between certain types of nodes from the *landscape* and the *request*. As
-multiple weaves are possible we need to know determine and validate the
+multiple weaves are possible we need to know determine and validate (adhering conditions like compositions and attribute requirements) the
 possible candidates and determine the best. Defining the best one can be done
 using a very simple principle. A good weave is defined by:
 

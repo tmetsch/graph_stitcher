@@ -1,7 +1,7 @@
 # graph stitcher
 
 This tool is a little framework to determine possible merges between two graphs
-based on a set of required additional relationships (aka as stitches / edges).
+based on a set of required additional relationships (aka stitches / edges).
 Based on a set of possible resulting candidate graphs we validate which of the
 candidates graphs is the "best".
 
@@ -23,7 +23,7 @@ consumers (the microwave) of the same socket as the fuse might give up. How
 loaded the power socket is can be expressed through the previously mentioned
 rank.
 
-Hence **stitching** two graph together is done by adding relationships (edges)
+Hence **stitching** two graphs together is done by adding relationships (edges)
 between certain types of nodes from the *container* and the *request*. As
 multiple stitches are possible we need to know determine and validate (adhering
 conditions like compositions and attribute requirements) the possible
@@ -34,7 +34,7 @@ very simple principle. A good stitch is defined by:
 * the resulting graph is stable and none of the existing nodes (entities) are
 impacted by the requested once.
 
-Through the pluggable architecture of graph stitcher we can now implement
+Through the pluggable architecture of this tool we can now implement
 different algorithms on how to determine if a resulting graph is good
 & stable:
 
@@ -51,10 +51,11 @@ priority, fair share, fifo, ... algorithms) within clusters.
 ## graph stitcher's internals
 
 As mentioned above graph stitcher is pluggable to test different algorithms of
-weaving/validating two graphs together. Hence it has a pluggable interface for
-the *stitch()* and *validate()* function (see Basestitcher class).
+stitching/validating two graphs together. Hence it has a pluggable interface
+for the *stitch()* and *validate()* routine (see BaseStitcher class).
 
-Too stitch two graphs it needs to know how and which relationships are needed:
+To stitch two graphs the tool needs to know how and which relationships are
+needed:
 
     Type of source node | Type of target node
     -----------------------------------------

@@ -70,7 +70,7 @@ class TestIncomingEdgesticher(unittest.TestCase):
 
 class TestNodeRankticher(unittest.TestCase):
     """
-    Test the simple sticher class based on rankes.
+    Test the simple sticher class based on ranks.
     """
 
     def setUp(self):

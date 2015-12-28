@@ -17,12 +17,12 @@ def main():
     # XXX: change this to whatever stitcher you want to use
     stitcher = stitch.IncomingEdgeStitcher()
     # stitcher = stitch.NodeRankstitcher()
-    containers = stitcher.stitch(container, request)
-    results = stitcher.validate(containers, {'b': 5})
+    graphs = stitcher.stitch(container, request)
+    results = stitcher.validate(graphs, {'b': 5})
     # results = stitcher.validate(containers, {'a': (1, 4)})
 
     # XXX: disable this if you do not want to see the results.
-    vis.show(containers, request.nodes(), results)
+    vis.show(graphs, request.nodes(), results)
 
 
 if __name__ == '__main__':

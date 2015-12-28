@@ -3,19 +3,19 @@
   "graph": {}, 
   "nodes": [
     {
-      "score": 0, 
       "type": "x", 
-      "id": "k"
+      "id": "k", 
+      "rank": 0
     }, 
     {
-      "score": 0, 
       "type": "z", 
-      "id": "m"
+      "id": "m", 
+      "rank": 0
     }, 
     {
-      "score": 0, 
       "type": "y", 
-      "id": "l"
+      "id": "l", 
+      "rank": 0
     }
   ], 
   "links": [

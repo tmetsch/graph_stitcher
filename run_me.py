@@ -18,7 +18,7 @@ def main():
     # TODO: allow for chaining of validators & stichers
     # XXX: change this to whatever sticher you want to use
     sticher = stich.IncomingEdgeSticher()
-    # sticher = stich.NodeScoreSticher()
+    # sticher = stich.NodeRankSticher()
     containers = sticher.stich(container, request)
     results = sticher.validate(containers, {'b': 5})
     # results = sticher.validate(containers, {'a': (1, 4)})

@@ -3,44 +3,44 @@
   "graph": {}, 
   "nodes": [
     {
-      "score": 0, 
       "type": "a", 
-      "id": "A"
+      "id": "A", 
+      "rank": 0
     }, 
     {
-      "score": 2, 
       "type": "b", 
-      "id": "C"
+      "id": "C", 
+      "rank": 2
     }, 
     {
-      "score": 5, 
       "type": "a", 
-      "id": "B"
+      "id": "B", 
+      "rank": 5
     }, 
     {
-      "score": 4, 
       "type": "c", 
-      "id": "E"
+      "id": "E", 
+      "rank": 4
     }, 
     {
-      "score": 9, 
       "type": "b", 
-      "id": "D"
+      "id": "D", 
+      "rank": 9
     }, 
     {
-      "score": 3, 
       "type": "c", 
-      "id": "F"
+      "id": "F", 
+      "rank": 3
     }, 
     {
-      "score": 0, 
       "type": "x", 
-      "id": "1"
+      "id": "1", 
+      "rank": 0
     }, 
     {
-      "score": 0, 
       "type": "y", 
-      "id": "2"
+      "id": "2", 
+      "rank": 0
     }
   ], 
   "links": [

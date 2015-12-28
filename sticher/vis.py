@@ -38,14 +38,14 @@ def _plot_sub_plot(graph, new_nodes, prog, ax):
     for node, values in graph.nodes(data=True):
         if node in new_nodes:
             blue_nodes.append(node)
-        elif 'score' in values and values['score'] > 7:
+        elif 'rank' in values and values['rank'] > 7:
             red_nodes.append(node)
-        elif 'score' in values and values['score'] < 7 and values['score'] > 3:
+        elif 'rank' in values and values['rank'] < 7 and values['rank'] > 3:
             yellow_nodes.append(node)
         else:
             green_nodes.append(node)
 
-    # draw nodes with score between 0-3 green, 3-7 yellow, 7-10 red
+    # draw nodes with rank between 0-3 green, 3-7 yellow, 7-10 red
     nx.draw_networkx_nodes(graph, pos, nodelist=green_nodes, node_color='g',
                            alpha=0.8, ax=ax)
     nx.draw_networkx_nodes(graph, pos, nodelist=yellow_nodes, node_color='y',

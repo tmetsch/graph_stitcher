@@ -19,7 +19,7 @@ class BaseSticher(object):
         of possible options.
 
         :param container: A graph describing the existing container with
-            scores.
+            ranks.
         :param request: A graph describing the request.
         :param conditions: Dictionary with conditions - e.g. node a & b need
             to be related to node c.
@@ -116,15 +116,15 @@ class IncomingEdgeSticher(BaseSticher):
         return res
 
 
-class NodeScoreSticher(BaseSticher):
+class NodeRankSticher(BaseSticher):
     """
-    Implements simple rule to validate stiches based on scores & incoming edges
+    Implements simple rule to validate stiches based on ranks & incoming edges
     of a node.
     """
 
     def validate(self, graphs, condition={}):
         """
-        In case a score of a node and # of incoming edges increases determine
+        In case a rank of a node and # of incoming edges increases determine
         possible stiches as a bad stich.
         """
         res = {}
@@ -137,7 +137,7 @@ class NodeScoreSticher(BaseSticher):
                 else:
                     tmp = condition[values['type']]
                 if len(candidate.in_edges(node)) >= tmp[0] \
-                        and values['score'] >= tmp[1]:
-                    res[i] = 'node ' + str(node) + ' has a to high score.'
+                        and values['rank'] >= tmp[1]:
+                    res[i] = 'node ' + str(node) + ' has a to high rank.'
             i += 1
         return res

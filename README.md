@@ -11,7 +11,7 @@ placed in an container which already contains a set of different entities.
 Let's assume the entities to be placed can be described using a *request* graph
 (as in entities having a relationship) and the existing *container* can be
 described as a graph as well (entities having relationships and are already
-scored). Nodes & edges in the existing container should be scored to indicate
+ranked). Nodes & edges in the existing container should be ranked to indicate
 how loaded/busy they are.
 
 Adding a new set of entities (e.g. a lamp described by the lamp bulb & fitting)
@@ -21,7 +21,7 @@ socket). But not all possible relationship setups might be good as e.g. adding
 another consumer (the lamp) to a certain power socket might impact other
 consumers (the microwave) of the same socket as the fuse might give up. How
 loaded the power socket is can be expressed through the previously mentioned
-score.
+rank.
 
 Hence **stiching** two graph together is done by adding relationships (edges)
 between certain types of nodes from the *container* and the *request*. As
@@ -41,7 +41,7 @@ different algorithms on how to determine if a resulting graph is good
 * through a simple rule saying for a node of type A, the maximum number of
   incoming dependencies is Y
 * through a simple rule saying for a node of type B, that it cannot take more
-  incoming relationships when it's score is over an threshold K.
+  incoming relationships when it's rank is over an threshold K.
 * (many more .e.g implement your own)
 
 This tool obviously can also be used to enhance the placement of workload after

@@ -68,9 +68,9 @@ class TestIncomingEdgesticher(unittest.TestCase):
         self.assertTrue(res2[0] == 'node C has to many edges: 5')
 
 
-class TestNodeScoresticher(unittest.TestCase):
+class TestNodeRankticher(unittest.TestCase):
     """
-    Test the simple sticher class based on scores.
+    Test the simple sticher class based on rankes.
     """
 
     def setUp(self):
@@ -80,7 +80,7 @@ class TestNodeScoresticher(unittest.TestCase):
         request_tmp = json.load(open('data/request.json'))
         self.request = json_graph.node_link_graph(request_tmp,
                                                   directed=True)
-        self.cut = stich.NodeScoreSticher()
+        self.cut = stich.NodeRankSticher()
 
     def test_validate_for_success(self):
         res1 = self.cut.stich(self.container, self.request)
@@ -94,4 +94,4 @@ class TestNodeScoresticher(unittest.TestCase):
         res2 = self.cut.validate(res1, {'a': (1, 4)})
 
         self.assertTrue(len(res2) == 8)
-        self.assertTrue(res2[4] == 'node B has a to high score.')
+        self.assertTrue(res2[4] == 'node B has a to high rank.')

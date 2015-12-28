@@ -7,7 +7,7 @@ setup(name = 'graph_sticher',
                      'merges between two graphs based on a set of required'
                      'additional relationships (aka as stiches / edges).'),
       license = "MIT",
-      keywords = 'graphs algorithms framework',
+      keywords = 'graph stiching algorithms framework',
       packages=['sticher'],
       classifiers=[
           "Development Status :: 3 - Alpha",

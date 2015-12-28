@@ -4,27 +4,27 @@ import json
 
 from networkx.readwrite import json_graph
 
-from weavy import weave
-from weavy import vis
+from sticher import stich
+from sticher import vis
 
 
 def main():
-    landscape_tmp = json.load(open('data/landscape.json'))
-    landscape = json_graph.node_link_graph(landscape_tmp, directed=True)
+    container_tmp = json.load(open('data/container.json'))
+    container = json_graph.node_link_graph(container_tmp, directed=True)
     request_tmp = json.load(open('data/request.json'))
     request = json_graph.node_link_graph(request_tmp, directed=True)
 
 
-    # TODO: allow for chaining of validators & weavers
-    # XXX: change this to whatever weaver you want to use
-    in_weaver = weave.IncomingEdgeWeaver()
-    # score_weaver = weave.NodeScoreWeaver()
-    landscapes = in_weaver.weave(landscape, request)
-    results = in_weaver.validate(landscapes, {'b': 5})
-    # results = score_weaver.validate(landscapes, {'a': (1, 4)})
+    # TODO: allow for chaining of validators & stichers
+    # XXX: change this to whatever sticher you want to use
+    sticher = stich.IncomingEdgeSticher()
+    # sticher = stich.NodeScoreSticher()
+    containers = sticher.stich(container, request)
+    results = sticher.validate(containers, {'b': 5})
+    # results = sticher.validate(containers, {'a': (1, 4)})
 
     # XXX: disable this if you do not want to see the results.
-    vis.show(landscapes, request.nodes(), results)
+    vis.show(containers, request.nodes(), results)
 
 
 if __name__ == '__main__':

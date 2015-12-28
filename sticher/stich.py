@@ -5,38 +5,38 @@ import json
 import networkx as nx
 
 
-class BaseWeaver(object):
+class BaseSticher(object):
     """
-    Base weaver with the function which need to be implemented.
+    Base sticher with the function which need to be implemented.
     """
 
-    def __init__(self, filename='data/weave.json'):
+    def __init__(self, filename='data/stich.json'):
         self.rels = json.load(open(filename, 'r'))
 
-    def weave(self, landscape, request, conditions=None, filter=filter):
+    def stich(self, container, request, conditions=None, filter=filter):
         """
-        Weave a request graph into an existing graph landscape. Returns a set
+        Stich a request graph into an existing graph container. Returns a set
         of possible options.
 
-        :param landscape: A graph describing the existing landscape with
+        :param container: A graph describing the existing container with
             scores.
         :param request: A graph describing the request.
         :param conditions: Dictionary with conditions - e.g. node a & b need
             to be related to node c.
         :param filter: Function which allows for filtering useless options
             upfront.
-        :return: The resulting landscape(s).
+        :return: The resulting graphs(s).
         """
         res = []
         # TODO: optimize this
         # TODO: adhere conditions (composition & rewuirements)
-        # TODO: add filter function to eliminate non valid weaves upfront.
+        # TODO: add filter function to eliminate non valid stiches upfront.
 
         # 1. find possible mappings
         tmp = {}
         for node, attr in request.nodes(data=True):
             if attr['type'] in self.rels:
-                candidates = self._find_nodes(landscape,
+                candidates = self._find_nodes(container,
                                               self.rels[attr['type']])
                 for candidate in candidates:
                     if node not in tmp:
@@ -44,7 +44,7 @@ class BaseWeaver(object):
                     else:
                         tmp[node].append(candidate)
 
-        # TODO: allow for nodes in request not related to landscape nodes!
+        # TODO: allow for nodes in request not related to container nodes!
         # 2. find candidates
         candidate_edge_list = []
         keys = tmp.keys()
@@ -60,8 +60,8 @@ class BaseWeaver(object):
                 j += 1
             candidate_edge_list.append(edges)
 
-        # 3. create candidate landscapes
-        tmp_graph = nx.union(landscape, request)
+        # 3. create candidate containers
+        tmp_graph = nx.union(container, request)
         for item in candidate_edge_list:
             candidate_graph = tmp_graph.copy()
             for s, t in item:
@@ -69,12 +69,12 @@ class BaseWeaver(object):
             res.append(candidate_graph)
         return res
 
-    def validate(self, landscapes):
+    def validate(self, graphs):
         """
-        Validate a set of landscape from the weave() function. Return a
+        Validate a set of graphs from the stich() function. Return a
         dictionary with the index & explanatory text.
 
-        :param landscapes: List of possible landscapes
+        :param graphs: List of possible graphs
         :return: dict with int:str.
         """
         raise NotImplementedError('Needs to be implemented...')
@@ -90,19 +90,19 @@ class BaseWeaver(object):
         pass
 
 
-class IncomingEdgeWeaver(BaseWeaver):
+class IncomingEdgeSticher(BaseSticher):
     """
     Implemented simple rule to validate based on # of incoming edges.
     """
 
-    def validate(self, landscapes, condition={}):
+    def validate(self, graphs, condition={}):
         """
         In case a node of a certain type has more then a threshold of incoming
-        edges determine a possible weave as a bad weave.
+        edges determine a possible stiches as a bad stich.
         """
         res = {}
         i = 0
-        for candidate in landscapes:
+        for candidate in graphs:
             res[i] = 'ok'
             for node, values in candidate.nodes(data=True):
                 if values['type'] not in condition.keys():
@@ -116,20 +116,20 @@ class IncomingEdgeWeaver(BaseWeaver):
         return res
 
 
-class NodeScoreWeaver(BaseWeaver):
+class NodeScoreSticher(BaseSticher):
     """
-    Implements simple rule to validate weave based on scores & incoming edges
+    Implements simple rule to validate stiches based on scores & incoming edges
     of a node.
     """
 
-    def validate(self, landscapes, condition={}):
+    def validate(self, graphs, condition={}):
         """
         In case a score of a node and # of incoming edges increases determine
-        possible weave as a bad weave.
+        possible stiches as a bad stich.
         """
         res = {}
         i = 0
-        for candidate in landscapes:
+        for candidate in graphs:
             res[i] = 'ok'
             for node, values in candidate.nodes(data=True):
                 if values['type'] not in condition.keys():

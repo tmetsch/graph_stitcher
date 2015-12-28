@@ -3,10 +3,10 @@
 import matplotlib.pyplot as plt
 import networkx as nx
 
-# TODO: display inital request & landscape. autoscale subplots
+# TODO: display inital request & container. autoscale subplots
 
 
-def show(landscapes, new_nodes, results, prog='neato', size=(2, 4)):
+def show(graphs, new_nodes, results, prog='neato', size=(2, 4)):
     """
     Display the results using matplotlib.
     """
@@ -15,7 +15,7 @@ def show(landscapes, new_nodes, results, prog='neato', size=(2, 4)):
     x = 0
     y = 0
     i = 0
-    for candidate in landscapes:
+    for candidate in graphs:
         axarr[x, y].axis('off')
         axarr[x, y].set_title(results[i])
         axarr[x, y].set_axis_bgcolor("white")

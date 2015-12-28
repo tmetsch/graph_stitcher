@@ -138,6 +138,6 @@ class NodeRankstitcher(Basestitcher):
                     tmp = condition[values['type']]
                 if len(candidate.in_edges(node)) >= tmp[0] \
                         and values['rank'] >= tmp[1]:
-                    res[i] = 'node ' + str(node) + ' has a to high rank.'
+                    res[i] = 'node ' + str(node) + ' has a high rank.'
             i += 1
         return res

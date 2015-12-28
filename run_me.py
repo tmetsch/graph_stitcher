@@ -16,7 +16,7 @@ def main():
 
     # TODO: allow for chaining of validators & stitchers
     # XXX: change this to whatever stitcher you want to use
-    stitcher = stitch.IncomingEdgestitcher()
+    stitcher = stitch.IncomingEdgeStitcher()
     # stitcher = stitch.NodeRankstitcher()
     containers = stitcher.stitch(container, request)
     results = stitcher.validate(containers, {'b': 5})

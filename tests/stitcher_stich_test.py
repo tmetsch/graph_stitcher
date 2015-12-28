@@ -7,7 +7,7 @@ import json
 import unittest
 
 
-class TestBasestitcher(unittest.TestCase):
+class TestBaseStitcher(unittest.TestCase):
     """
     Test the base stitchr class.
     """
@@ -19,7 +19,7 @@ class TestBasestitcher(unittest.TestCase):
         request_tmp = json.load(open('data/request.json'))
         self.request = json_graph.node_link_graph(request_tmp,
                                                   directed=True)
-        self.cut = stitch.Basestitcher()
+        self.cut = stitch.BaseStitcher()
 
     def test_stitch_for_success(self):
         self.cut.stitch(self.container, self.request)
@@ -39,7 +39,7 @@ class TestBasestitcher(unittest.TestCase):
             self.container.number_of_nodes() + 3
 
 
-class TestIncomingEdgestitcher(unittest.TestCase):
+class TestIncomingEdgeStitcher(unittest.TestCase):
     """
     Test the simple stitcher class based on # of incoming edges.
     """
@@ -51,7 +51,7 @@ class TestIncomingEdgestitcher(unittest.TestCase):
         request_tmp = json.load(open('data/request.json'))
         self.request = json_graph.node_link_graph(request_tmp,
                                                   directed=True)
-        self.cut = stitch.IncomingEdgestitcher()
+        self.cut = stitch.IncomingEdgeStitcher()
 
     def test_validate_for_success(self):
         res1 = self.cut.stitch(self.container, self.request)
@@ -68,7 +68,7 @@ class TestIncomingEdgestitcher(unittest.TestCase):
         self.assertTrue(res2[0] == 'node C has to many edges: 5')
 
 
-class TestNodeRankticher(unittest.TestCase):
+class TestNodeRankSticher(unittest.TestCase):
     """
     Test the simple stitcher class based on ranks.
     """
@@ -80,7 +80,7 @@ class TestNodeRankticher(unittest.TestCase):
         request_tmp = json.load(open('data/request.json'))
         self.request = json_graph.node_link_graph(request_tmp,
                                                   directed=True)
-        self.cut = stitch.NodeRankstitcher()
+        self.cut = stitch.NodeRankStitcher()
 
     def test_validate_for_success(self):
         res1 = self.cut.stitch(self.container, self.request)

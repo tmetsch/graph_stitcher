@@ -5,7 +5,7 @@ import json
 import networkx as nx
 
 
-class Basestitcher(object):
+class BaseStitcher(object):
     """
     Base stitcher with the function which need to be implemented.
     """
@@ -90,7 +90,7 @@ class Basestitcher(object):
         pass
 
 
-class IncomingEdgestitcher(Basestitcher):
+class IncomingEdgeStitcher(BaseStitcher):
     """
     Implemented simple rule to validate based on # of incoming edges.
     """
@@ -116,7 +116,7 @@ class IncomingEdgestitcher(Basestitcher):
         return res
 
 
-class NodeRankstitcher(Basestitcher):
+class NodeRankStitcher(BaseStitcher):
     """
     Implements simple rule to validate stitches based on ranks & incoming edges
     of a node.

@@ -75,6 +75,10 @@ Just do a:
 
     $ ./run_me.py
 
-You will hopefully see something similar to this:
+You will hopefully see something similar to the following diagram. The *k*,
+*l*, *m* nodes form the request. All other nodes represent the container (node
+colors indicate the rank, node forms the different types). The stitches are
+dotted lines. Each graph is a candidate solution, the results of the
+validation are shown as titles of the graphs.
 
 ![output](./figure_1.png?raw=true "Output")

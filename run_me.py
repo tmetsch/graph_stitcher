@@ -14,7 +14,6 @@ def main():
     request_tmp = json.load(open('data/request.json'))
     request = json_graph.node_link_graph(request_tmp, directed=True)
 
-    # TODO: allow for chaining of validators & stitchers
     # XXX: change this to whatever stitcher you want to use
     stitcher = stitch.IncomingEdgeStitcher()
     # stitcher = stitch.NodeRankstitcher()

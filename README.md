@@ -1,4 +1,4 @@
-# graph stitcher
+# Graph stitching
 
 This tool is a little framework to determine possible merges between two graphs
 based on a set of required additional relationships (aka stitches / edges).
@@ -55,13 +55,23 @@ As mentioned above graph stitcher is pluggable, to test different algorithms of
 interface for the *stitch()* and *validate()* routine (see *BaseStitcher*
 class).
 
-To stitch two graphs the tool needs to know how and which relationships are
-needed:
+To stitch two graphs the tool needs to know how which relationships are needed:
 
     Type of source node | Type of target node
     -----------------------------------------
     type_a              | type_x
     ...                 | ...
+
+There is a *filter()* function implemented which can filter based on required
+target attributes (example below: node a requires it's stitched target to have
+an attribute 'foo' with value 'x') or on the notion that two nodes require the
+same or different target (example below_ node 1 & 2 need to have the same
+stitched target node):
+
+    {
+     "attributes": {"a": ("foo": "x")},
+     "compositions": {"same": ("1", "2")}
+    }
 
 These are stored in the file (stitch.json). Sample graphs & tests can be found
 in the **tests** directory as well.

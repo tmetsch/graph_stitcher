@@ -5,11 +5,70 @@ from networkx.readwrite import json_graph
 
 import json
 import unittest
+import networkx as nx
+
+
+class TestFilteringConditions(unittest.TestCase):
+    """
+    Tests the filter functions and validates that the right candidates are
+    eliminated.
+    """
+
+    def setUp(self):
+        self.container = nx.DiGraph()
+        self.container.add_node('1', {'type': 'a'})
+        self.container.add_node('2', {'type': 'a', 'foo': 'y'})
+        self.container.add_node('3', {'type': 'b', 'foo': 'x'})
+        self.container.add_edge('1', '2')
+        self.container.add_edge('2', '3')
+
+        self.request = nx.DiGraph()
+        self.request.add_node('a', {'type': 'x'})
+        self.request.add_node('b', {'type': 'x'})
+        self.request.add_edge('a', 'b')
+
+        self.cut = stitch.BaseStitcher()
+
+    def test_filter_for_success(self):
+        pass
+
+    def test_filter_for_failure(self):
+        pass
+
+    def test_filter_for_sanity(self):
+        # none given as condition should results input = output
+        input = [1, 2, 3]
+        output = stitch.filter(self.container, [1, 2, 3], None)
+        self.assertEqual(input, output)
+
+        # node a requires target node to have attribute foo set to y
+        condy = {'attributes': {'a': ('foo', 'y')}}
+        res1 = self.cut.stitch(self.container, self.request, conditions=condy)
+        # only 2 options left!
+        self.assertEquals(len(res1), 2)
+
+        # node a & b to be placed on same target!
+        condy = {'compositions': {'same': ('b', 'a')}}
+        res1 = self.cut.stitch(self.container, self.request, conditions=condy)
+        condy = {'compositions': {'same': ('b', 'a')}}
+        res2 = self.cut.stitch(self.container, self.request, conditions=condy)
+        # only two options left!
+        self.assertTrue(len(res1) == 2)
+        self.assertTrue(len(res2) == 2)
+
+        # node a & b to be placed on different target!
+        condy = {'compositions': {'diff': ('b', 'a')}}
+        res1 = self.cut.stitch(self.container, self.request, conditions=condy)
+        condy = {'compositions': {'diff': ('b', 'a')}}
+        res2 = self.cut.stitch(self.container, self.request, conditions=condy)
+        # only two options left!
+        self.assertTrue(len(res1) == 2)
+        self.assertTrue(len(res2) == 2)
 
 
 class TestBaseStitcher(unittest.TestCase):
     """
-    Test the base stitchr class.
+    Test the base stitcher class.
     """
 
     def setUp(self):

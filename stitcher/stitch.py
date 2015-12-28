@@ -5,6 +5,103 @@ import json
 import networkx as nx
 
 
+def filter(container, edge_list, conditions):
+    """
+    Default filter which scans the candidate edge list and eliminates those
+    candidates which do not adhere the conditions. Following conditions are
+    available:
+
+    attributes - the target node need to have a certain attribute
+    composition - two nodes need to have same target node or two nodes should
+        not have the same target node.
+
+    :param edge_list: the candidate edge list as created by stitch().
+    :param conditions: dictionary containing the conditions.
+    :return: The filtered edge list.
+    """
+    if conditions is None:
+        return edge_list
+    else:
+        rm = []
+        if 'attributes' in conditions:
+            rm.extend(_attr_filter(container, edge_list, conditions))
+        elif 'compositions' in conditions:
+            for condition in conditions['compositions']:
+                n1 = conditions['compositions'][condition][0]
+                n2 = conditions['compositions'][condition][1]
+                if condition is 'same':
+                    rm.extend(_same_filter(n1, n2, edge_list))
+                elif condition is 'diff':
+                    rm.extend(_diff_filter(n1, n2, edge_list))
+
+        for item in rm:
+            edge_list.remove(item)
+        return edge_list
+
+
+def _attr_filter(container, edge_list, conditions):
+    """
+    Filter on attributes needed on target node.
+    """
+    rm = []
+    for condition in conditions['attributes']:
+        for candidate in edge_list:
+            for s, t in candidate:
+                attrn = conditions['attributes'][condition][0]
+                attrv = conditions['attributes'][condition][1]
+                if s == condition and attrn not in container.node[t]:
+                    rm.append(candidate)
+                if s == condition and attrn in container.node[t] \
+                        and attrv != container.node[t][attrn]:
+                    rm.append(candidate)
+    return rm
+
+
+def _same_filter(n1, n2, edge_list):
+    """
+    Filter out edge which do not adhere the same target composition request.
+    """
+    rm = []
+    for candidate in edge_list:
+        n1_trg = ''
+        n2_trg = ''
+        for s, t in candidate:
+            if n1_trg == '' and s == n1:
+                n1_trg = t
+            elif n1_trg != '' and s == n2:
+                if t != n1_trg:
+                    rm.append(candidate)
+            if n2_trg == '' and s == n2:
+                n2_trg = t
+            elif n2_trg != '' and s == n1:
+                if t != n2_trg:
+                    rm.append(candidate)
+    return rm
+
+
+def _diff_filter(n1, n2, edge_list):
+    """
+    Filter out edge which do not adhere the different target composition
+    request.
+    """
+    rm = []
+    for candidate in edge_list:
+        n1_trg = ''
+        n2_trg = ''
+        for s, t in candidate:
+            if n1_trg == '' and s == n1:
+                n1_trg = t
+            elif n1_trg != '' and s == n2:
+                if t == n1_trg:
+                    rm.append(candidate)
+            if n2_trg == '' and s == n2:
+                n2_trg = t
+            elif n2_trg != '' and s == n1:
+                if t == n2_trg:
+                    rm.append(candidate)
+    return rm
+
+
 class BaseStitcher(object):
     """
     Base stitcher with the function which need to be implemented.
@@ -29,8 +126,6 @@ class BaseStitcher(object):
         """
         res = []
         # TODO: optimize this
-        # TODO: adhere conditions (composition & requirements)
-        # TODO: add filter function to eliminate non valid stitches upfront.
 
         # 1. find possible mappings
         tmp = {}
@@ -59,7 +154,11 @@ class BaseStitcher(object):
                 j += 1
             candidate_edge_list.append(edges)
 
-        # 3. create candidate containers
+        # 3. (optional step): filter
+        candidate_edge_list = filter(container, candidate_edge_list,
+                                     conditions)
+
+        # 4. create candidate containers
         tmp_graph = nx.union(container, request)
         for item in candidate_edge_list:
             candidate_graph = tmp_graph.copy()
@@ -76,6 +175,7 @@ class BaseStitcher(object):
         :param graphs: List of possible graphs
         :return: dict with int:str.
         """
+        # TODO: allow for chaining of validators & stitchers
         raise NotImplementedError('Needs to be implemented...')
 
     def _find_nodes(self, graph, tzpe):
@@ -84,9 +184,6 @@ class BaseStitcher(object):
             if values['type'] == tzpe:
                 res.append(node)
         return res
-
-    def _filter(self):
-        pass
 
 
 class IncomingEdgeStitcher(BaseStitcher):

@@ -1,7 +1,7 @@
 # graph sticher
 
 This tool is a little framework to determine possible merges between two graphs
-based on a set of required additional relationships (aka as stcihes / edges).
+based on a set of required additional relationships (aka as stiches / edges).
 Based on a set of possible resulting candidate graphs we validate which of the
 candidates graphs is the "best".
 

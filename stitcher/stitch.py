@@ -15,7 +15,7 @@ class Basestitcher(object):
 
     def stitch(self, container, request, conditions=None, filter=filter):
         """
-        stitch a request graph into an existing graph container. Returns a set
+        Stitch a request graph into an existing graph container. Returns a set
         of possible options.
 
         :param container: A graph describing the existing container with

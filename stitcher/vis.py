@@ -3,7 +3,8 @@
 import matplotlib.pyplot as plt
 import networkx as nx
 
-# TODO: display inital request & container. autoscale subplots
+# TODO: display inital request & container; autoscale subplots; stiches as
+# dotted lines
 
 
 def show(graphs, new_nodes, results, prog='neato', size=(2, 4)):

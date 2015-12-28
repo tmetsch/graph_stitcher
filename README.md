@@ -35,7 +35,7 @@ very simple principle. A good stich is defined by:
 impacted by the requested once.
 
 Through the pluggable architecture of graph sticher we can now implement
-different algorithms on how to determine if a resulting container is good
+different algorithms on how to determine if a resulting graph is good
 & stable:
 
 * through a simple rule saying for a node of type A, the maximum number of

@@ -23,7 +23,7 @@ consumers (the microwave) of the same socket as the fuse might give up. How
 loaded the power socket is can be expressed through the previously mentioned
 score.
 
-Hence **weaving** two graph together is done by adding relationships (edges)
+Hence **stiching** two graph together is done by adding relationships (edges)
 between certain types of nodes from the *container* and the *request*. As
 multiple stiches are possible we need to know determine and validate (adhering
 conditions like compositions and attribute requirements) the possible

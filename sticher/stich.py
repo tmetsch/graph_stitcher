@@ -5,17 +5,17 @@ import json
 import networkx as nx
 
 
-class BaseSticher(object):
+class Basestitcher(object):
     """
-    Base sticher with the function which need to be implemented.
+    Base stitcher with the function which need to be implemented.
     """
 
-    def __init__(self, filename='data/stich.json'):
+    def __init__(self, filename='data/stitch.json'):
         self.rels = json.load(open(filename, 'r'))
 
-    def stich(self, container, request, conditions=None, filter=filter):
+    def stitch(self, container, request, conditions=None, filter=filter):
         """
-        Stich a request graph into an existing graph container. Returns a set
+        stitch a request graph into an existing graph container. Returns a set
         of possible options.
 
         :param container: A graph describing the existing container with
@@ -30,7 +30,7 @@ class BaseSticher(object):
         res = []
         # TODO: optimize this
         # TODO: adhere conditions (composition & rewuirements)
-        # TODO: add filter function to eliminate non valid stiches upfront.
+        # TODO: add filter function to eliminate non valid stitches upfront.
 
         # 1. find possible mappings
         tmp = {}
@@ -71,7 +71,7 @@ class BaseSticher(object):
 
     def validate(self, graphs):
         """
-        Validate a set of graphs from the stich() function. Return a
+        Validate a set of graphs from the stitch() function. Return a
         dictionary with the index & explanatory text.
 
         :param graphs: List of possible graphs
@@ -90,7 +90,7 @@ class BaseSticher(object):
         pass
 
 
-class IncomingEdgeSticher(BaseSticher):
+class IncomingEdgestitcher(Basestitcher):
     """
     Implemented simple rule to validate based on # of incoming edges.
     """
@@ -98,7 +98,7 @@ class IncomingEdgeSticher(BaseSticher):
     def validate(self, graphs, condition={}):
         """
         In case a node of a certain type has more then a threshold of incoming
-        edges determine a possible stiches as a bad stich.
+        edges determine a possible stitches as a bad stitch.
         """
         res = {}
         i = 0
@@ -116,16 +116,16 @@ class IncomingEdgeSticher(BaseSticher):
         return res
 
 
-class NodeRankSticher(BaseSticher):
+class NodeRankstitcher(Basestitcher):
     """
-    Implements simple rule to validate stiches based on ranks & incoming edges
+    Implements simple rule to validate stitches based on ranks & incoming edges
     of a node.
     """
 
     def validate(self, graphs, condition={}):
         """
         In case a rank of a node and # of incoming edges increases determine
-        possible stiches as a bad stich.
+        possible stitches as a bad stitch.
         """
         res = {}
         i = 0

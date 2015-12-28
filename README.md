@@ -1,7 +1,7 @@
-# graph sticher
+# graph stitcher
 
 This tool is a little framework to determine possible merges between two graphs
-based on a set of required additional relationships (aka as stiches / edges).
+based on a set of required additional relationships (aka as stitches / edges).
 Based on a set of possible resulting candidate graphs we validate which of the
 candidates graphs is the "best".
 
@@ -23,18 +23,18 @@ consumers (the microwave) of the same socket as the fuse might give up. How
 loaded the power socket is can be expressed through the previously mentioned
 rank.
 
-Hence **stiching** two graph together is done by adding relationships (edges)
+Hence **stitching** two graph together is done by adding relationships (edges)
 between certain types of nodes from the *container* and the *request*. As
-multiple stiches are possible we need to know determine and validate (adhering
+multiple stitches are possible we need to know determine and validate (adhering
 conditions like compositions and attribute requirements) the possible
 candidates and determine the best. Defining the best one can be done using a
-very simple principle. A good stich is defined by:
+very simple principle. A good stitch is defined by:
 
 * all new relationships are satisfied
 * the resulting graph is stable and none of the existing nodes (entities) are
 impacted by the requested once.
 
-Through the pluggable architecture of graph sticher we can now implement
+Through the pluggable architecture of graph stitcher we can now implement
 different algorithms on how to determine if a resulting graph is good
 & stable:
 
@@ -48,23 +48,23 @@ This tool obviously can also be used to enhance the placement of workload after
 a scheduling decision has been made (based on round-robin, preemptive,
 priority, fair share, fifo, ... algorithms) within clusters.
 
-## graph sticher's internals
+## graph stitcher's internals
 
-As mentioned above graph sticher is pluggable to test different algorithms of
+As mentioned above graph stitcher is pluggable to test different algorithms of
 weaving/validating two graphs together. Hence it has a pluggable interface for
-the *stich()* and *validate()* function (see BaseSticher class).
+the *stitch()* and *validate()* function (see Basestitcher class).
 
-Too stich two graphs it needs to know how and which relationships are needed:
+Too stitch two graphs it needs to know how and which relationships are needed:
 
     Type of source node | Type of target node
     -----------------------------------------
     type_a              | type_x
     ...                 | ...
 
-These are stored in the file (stich.json). Sample graphs & tests can be found
+These are stored in the file (stitch.json). Sample graphs & tests can be found
 in the **tests** directory as well.
 
-graph sticher is mostly developed to test & play around. Also to check if
+graph stitcher is mostly developed to test & play around. Also to check if
 [evolutionary algorithms](https://en.wikipedia.org/wiki/Evolutionary_algorithm)
 can be developed to determine the best resulting graph.
 

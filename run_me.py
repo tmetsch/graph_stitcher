@@ -4,8 +4,8 @@ import json
 
 from networkx.readwrite import json_graph
 
-from sticher import stich
-from sticher import vis
+from stitcher import stitch
+from stitcher import vis
 
 
 def main():
@@ -15,13 +15,13 @@ def main():
     request = json_graph.node_link_graph(request_tmp, directed=True)
 
 
-    # TODO: allow for chaining of validators & stichers
-    # XXX: change this to whatever sticher you want to use
-    sticher = stich.IncomingEdgeSticher()
-    # sticher = stich.NodeRankSticher()
-    containers = sticher.stich(container, request)
-    results = sticher.validate(containers, {'b': 5})
-    # results = sticher.validate(containers, {'a': (1, 4)})
+    # TODO: allow for chaining of validators & stitchers
+    # XXX: change this to whatever stitcher you want to use
+    stitcher = stitch.IncomingEdgestitcher()
+    # stitcher = stitch.NodeRankstitcher()
+    containers = stitcher.stitch(container, request)
+    results = stitcher.validate(containers, {'b': 5})
+    # results = stitcher.validate(containers, {'a': (1, 4)})
 
     # XXX: disable this if you do not want to see the results.
     vis.show(containers, request.nodes(), results)

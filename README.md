@@ -65,7 +65,7 @@ To stitch two graphs the tool needs to know how which relationships are needed:
 There is a *filter()* function implemented which can filter based on required
 target attributes (example below: node a requires it's stitched target to have
 an attribute 'foo' with value 'x') or on the notion that two nodes require the
-same or different target (example below_ node 1 & 2 need to have the same
+same or different target (example below: node 1 & 2 need to have the same
 stitched target node):
 
     {

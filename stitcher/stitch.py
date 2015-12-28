@@ -29,7 +29,7 @@ class BaseStitcher(object):
         """
         res = []
         # TODO: optimize this
-        # TODO: adhere conditions (composition & rewuirements)
+        # TODO: adhere conditions (composition & requirements)
         # TODO: add filter function to eliminate non valid stitches upfront.
 
         # 1. find possible mappings
@@ -44,7 +44,6 @@ class BaseStitcher(object):
                     else:
                         tmp[node].append(candidate)
 
-        # TODO: allow for nodes in request not related to container nodes!
         # 2. find candidates
         candidate_edge_list = []
         keys = tmp.keys()

@@ -31,7 +31,20 @@ class TestBaseStitcher(unittest.TestCase):
         self.assertRaises(NotImplementedError, self.cut.validate, [])
 
     def test_stitch_for_sanity(self):
+        # basic stitch test
         res1 = self.cut.stitch(self.container, self.request)
+        self.assertTrue(len(res1) > 0)
+        self.assertTrue(res1[0].number_of_edges()) == \
+            self.container.number_of_edges() + 3
+        self.assertTrue(res1[0].number_of_nodes()) == \
+            self.container.number_of_nodes() + 3
+
+        # let's add a node to the request which does not require to be
+        # stitched to the container. Hence added edges = 3!
+        self.request.add_node('n', {'type': 'foo', 'rank': 7})
+        self.request.add_edge('k', 'n')
+        self.request.add_edge('n', 'l')
+
         self.assertTrue(len(res1) > 0)
         self.assertTrue(res1[0].number_of_edges()) == \
             self.container.number_of_edges() + 3
@@ -94,4 +107,4 @@ class TestNodeRankSticher(unittest.TestCase):
         res2 = self.cut.validate(res1, {'a': (1, 4)})
 
         self.assertTrue(len(res2) == 8)
-        self.assertTrue(res2[4] == 'node B has a to high rank.')
+        self.assertTrue(res2[4] == 'node B has a high rank.')

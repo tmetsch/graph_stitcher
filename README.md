@@ -50,9 +50,10 @@ priority, fair share, fifo, ... algorithms) within clusters.
 
 ## graph stitcher's internals
 
-As mentioned above graph stitcher is pluggable to test different algorithms of
-stitching/validating two graphs together. Hence it has a pluggable interface
-for the *stitch()* and *validate()* routine (see BaseStitcher class).
+As mentioned above graph stitcher is pluggable, to test different algorithms of
+**graph stitching** & validation of the same. Hence it has a pluggable
+interface for the *stitch()* and *validate()* routine (see *BaseStitcher*
+class).
 
 To stitch two graphs the tool needs to know how and which relationships are
 needed:

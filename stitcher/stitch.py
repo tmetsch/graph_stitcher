@@ -24,7 +24,20 @@ def filter(container, edge_list, conditions):
     else:
         rm = []
         if 'attributes' in conditions:
-            rm.extend(_attr_filter(container, edge_list, conditions))
+            for condition in conditions['attributes']:
+                para1 = conditions['attributes'][condition][0]
+                para2 = conditions['attributes'][condition][1]
+                if condition is 'eq':
+                    rm.extend(_eq_attr_filter(container, para1, para2, edge_list))
+                if condition is 'neq':
+                    rm.extend(_neq_attr_filter(container, para1, para2, edge_list))
+                if condition is 'lg':
+                    rm.extend(_lg_attr_filter(container, para1, para2, edge_list))
+                if condition is 'lt':
+                    rm.extend(_lt_attr_filter(container, para1, para2, edge_list))
+                if condition is 'regex':
+                    # TODO: support regex!
+                    pass
         if 'compositions' in conditions:
             for condition in conditions['compositions']:
                 para1 = conditions['compositions'][condition][0]
@@ -43,22 +56,69 @@ def filter(container, edge_list, conditions):
         return edge_list
 
 
-def _attr_filter(container, candidate_list, conditions):
+def _eq_attr_filter(container, node, condition, candidate_list):
     """
     Filter on attributes needed on target node.
     """
-    # TODO: support regex?
     rm = []
-    for condition in conditions['attributes']:
-        for candidate in candidate_list:
-            for s, t in candidate:
-                attrn = conditions['attributes'][condition][0]
-                attrv = conditions['attributes'][condition][1]
-                if s == condition and attrn not in container.node[t]:
-                    rm.append(candidate)
-                if s == condition and attrn in container.node[t] \
-                        and attrv != container.node[t][attrn]:
-                    rm.append(candidate)
+    for candidate in candidate_list:
+        attrn = condition[0]
+        attrv = condition[1]
+        for s, t in candidate:
+            if s == node and attrn not in container.node[t]:
+                rm.append(candidate)
+            if s == node and attrn in container.node[t] \
+                    and attrv != container.node[t][attrn]:
+                rm.append(candidate)
+    return rm
+
+
+def _neq_attr_filter(container, node, condition, candidate_list):
+    """
+    Filter on attributes unequal to requested value.
+    """
+    rm = []
+    for candidate in candidate_list:
+        attrn = condition[0]
+        attrv = condition[1]
+        for s, t in candidate:
+            if s == node and attrn in container.node[t] \
+                    and attrv == container.node[t][attrn]:
+                rm.append(candidate)
+    return rm
+
+
+def _lg_attr_filter(container, node, condition, candidate_list):
+    """
+    Filter on attributes larger than requested value.
+    """
+    rm = []
+    for candidate in candidate_list:
+        attrn = condition[0]
+        attrv = condition[1]
+        for s, t in candidate:
+            if s == node and attrn not in container.node[t]:
+                rm.append(candidate)
+            if s == node and attrn in container.node[t] \
+                    and attrv > container.node[t][attrn]:
+                rm.append(candidate)
+    return rm
+
+
+def _lt_attr_filter(container, node, condition, candidate_list):
+    """
+    Filter on attributes less than requested value.
+    """
+    rm = []
+    for candidate in candidate_list:
+        attrn = condition[0]
+        attrv = condition[1]
+        for s, t in candidate:
+            if s == node and attrn not in container.node[t]:
+                rm.append(candidate)
+            if s == node and attrn in container.node[t] \
+                    and attrv < container.node[t][attrn]:
+                rm.append(candidate)
     return rm
 
 

@@ -83,7 +83,7 @@ The basic filter support the following operations:
 The following dictionary can be passed in as a composition condition:
 
     {
-     "attributes": {"a": ("foo": "x")},
+     "attributes": {'equal': ('a', ('foo', 'y'))},
      "compositions": {"same": ("1", "2")},
                      {"diff": ("3", "4")},
                      {"share": ("group", ["x", "y"])}}

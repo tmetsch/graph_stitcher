@@ -16,15 +16,15 @@ class TestFilteringConditions(unittest.TestCase):
 
     def setUp(self):
         self.container = nx.DiGraph()
-        self.container.add_node('1', {'type': 'a'})
-        self.container.add_node('2', {'type': 'a', 'foo': 'y'})
+        self.container.add_node('1', {'type': 'a', 'foo': 'x', 'bar': 5})
+        self.container.add_node('2', {'type': 'a', 'foo': 'y', 'bar': 7})
         self.container.add_node('3', {'type': 'b', 'foo': 'x'})
         self.container.add_edge('1', '2')
         self.container.add_edge('2', '3')
 
         self.request = nx.DiGraph()
         self.request.add_node('a', {'type': 'x'})
-        self.request.add_node('b', {'type': 'x'})
+        self.request.add_node('b', {'type': 'y'})
         self.request.add_edge('a', 'b')
 
         self.cut = stitch.BaseStitcher()
@@ -42,28 +42,73 @@ class TestFilteringConditions(unittest.TestCase):
         self.assertEqual(input, output)
 
         # node a requires target node to have attribute foo set to y
-        condy = {'attributes': {'a': ('foo', 'y')}}
+        condy = {'attributes': {'eq': ('a', ('foo', 'y'))}}
         res1 = self.cut.stitch(self.container, self.request, conditions=condy)
-        # only 2 options left!
+        # only 1 option left - a->2, b->3!
+        self.assertEquals(len(res1), 1)
+
+        # node a requires target node to have attribute foo set to 5
+        condy = {'attributes': {'eq': ('a', ('bar', 5))}}
+        res1 = self.cut.stitch(self.container, self.request, conditions=condy)
+        # only 1 option left - a->1, b->3!
+        self.assertEquals(len(res1), 1)
+
+        # node a requires target node to have attribute foo not set to y
+        condy = {'attributes': {'neq': ('a', ('foo', 'y'))}}
+        res1 = self.cut.stitch(self.container, self.request, conditions=condy)
+        # only 1 option left - a->1, b->3!
+        self.assertEquals(len(res1), 1)
+
+        # node a requires target node to have attribute foo not set to 5
+        condy = {'attributes': {'neq': ('a', ('bar', 5))}}
+        res1 = self.cut.stitch(self.container, self.request, conditions=condy)
+        # only 1 option left - a->2, b->3!
+        self.assertEquals(len(res1), 1)
+
+        # node a requires target node to have an attribute foo with value > 5
+        condy = {'attributes': {'lg': ('a', ('bar', 6))}}
+        res1 = self.cut.stitch(self.container, self.request, conditions=condy)
+        # only 1 option left - a->2, b->3!
+        self.assertEquals(len(res1), 1)
+
+        # node a requires target node to have an attribute foo with value < 5
+        condy = {'attributes': {'lt': ('a', ('bar', 6))}}
+        res1 = self.cut.stitch(self.container, self.request, conditions=condy)
+        # only 1 option left - a->1, b->3!
+        self.assertEquals(len(res1), 1)
+
+        # # node a requires target node to have an attribute matching a regex
+        # condy = {'attributes': {'regex': ('a', ('foo', '\w'))}}
+        # res1 = self.cut.stitch(self.container, self.request, conditions=condy)
+        # # only 2 options left!
+        # self.assertEquals(len(res1), 2)
+
+        self.container.add_node('4', {'type': 'b', 'foo': 'x'})
+        self.container.add_edge('3', '4')
+        self.request.add_node('c', {'type': 'y'})
+        self.request.add_edge('b', 'c')
+
+        # node c & b to be stitched to same target!
+        condy = {'compositions': {'same': ('b', 'c')},
+                 'attributes': {'eq': ('a', ('foo', 'x'))}}
+        res1 = self.cut.stitch(self.container, self.request, conditions=condy)
+        condy = {'compositions': {'same': ('c', 'b')},
+                 'attributes': {'eq': ('a', ('foo', 'x'))}}
+        res2 = self.cut.stitch(self.container, self.request, conditions=condy)
+        # only 2 options left: b&c->3 or b&c->4
         self.assertEquals(len(res1), 2)
+        self.assertEquals(len(res2), 2)
 
-        # node a & b to be placed on same target!
-        condy = {'compositions': {'same': ('b', 'a')}}
+        # node a & b to be stitched to different targets!
+        condy = {'compositions': {'diff': ('b', 'c')},
+                 'attributes': {'eq': ('a', ('foo', 'x'))}}
         res1 = self.cut.stitch(self.container, self.request, conditions=condy)
-        condy = {'compositions': {'same': ('b', 'a')}}
+        condy = {'compositions': {'diff': ('c', 'b')},
+                 'attributes': {'eq': ('a', ('foo', 'x'))}}
         res2 = self.cut.stitch(self.container, self.request, conditions=condy)
-        # only two options left!
-        self.assertTrue(len(res1) == 2)
-        self.assertTrue(len(res2) == 2)
-
-        # node a & b to be placed on different target!
-        condy = {'compositions': {'diff': ('b', 'a')}}
-        res1 = self.cut.stitch(self.container, self.request, conditions=condy)
-        condy = {'compositions': {'diff': ('b', 'a')}}
-        res2 = self.cut.stitch(self.container, self.request, conditions=condy)
-        # only two options left!
-        self.assertTrue(len(res1) == 2)
-        self.assertTrue(len(res2) == 2)
+        # only 2 options left: b->3 & c->4 or b->4 & c->3
+        self.assertEquals(len(res1), 2)
+        self.assertEquals(len(res2), 2)
 
     def test_complex_filter_for_sanity(self):
         container = nx.DiGraph()
@@ -84,7 +129,7 @@ class TestFilteringConditions(unittest.TestCase):
 
         condy = {'compositions': {'share': ('group', ['1', '2']),
                                   'same': ('2', '3')},
-                 'attributes': {'1': ('geo', 'eu')}}
+                 'attributes': {'eq': ('1', ('geo', 'eu'))}}
 
         res1 = self.cut.stitch(container, request, conditions=condy)
 

@@ -1,6 +1,7 @@
 
 import itertools
 import json
+import re
 
 import networkx as nx
 
@@ -36,8 +37,7 @@ def filter(container, edge_list, conditions):
                 if condition is 'lt':
                     rm.extend(_lt_attr_filter(container, para1, para2, edge_list))
                 if condition is 'regex':
-                    # TODO: support regex!
-                    pass
+                    rm.extend(_regex_attr_filter(container, para1, para2, edge_list))
         if 'compositions' in conditions:
             for condition in conditions['compositions']:
                 para1 = conditions['compositions'][condition][0]
@@ -118,6 +118,23 @@ def _lt_attr_filter(container, node, condition, candidate_list):
                 rm.append(candidate)
             if s == node and attrn in container.node[t] \
                     and attrv < container.node[t][attrn]:
+                rm.append(candidate)
+    return rm
+
+
+def _regex_attr_filter(container, node, condition, candidate_list):
+    """
+    Filter on attributes which match an regex.
+    """
+    rm = []
+    for candidate in candidate_list:
+        attrn = condition[0]
+        regex = condition[1]
+        for s, t in candidate:
+            if s == node and attrn not in container.node[t]:
+                rm.append(candidate)
+            if s == node and attrn in container.node[t] \
+                    and not re.search(regex, container.node[t][attrn]):
                 rm.append(candidate)
     return rm
 

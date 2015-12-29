@@ -16,7 +16,8 @@ class TestFilteringConditions(unittest.TestCase):
 
     def setUp(self):
         self.container = nx.DiGraph()
-        self.container.add_node('1', {'type': 'a', 'foo': 'x', 'bar': 5})
+        self.container.add_node('1', {'type': 'a', 'foo': 'x', 'bar': 5,
+                                      'retest': 'abcde'})
         self.container.add_node('2', {'type': 'a', 'foo': 'y', 'bar': 7})
         self.container.add_node('3', {'type': 'b', 'foo': 'x'})
         self.container.add_edge('1', '2')
@@ -77,11 +78,19 @@ class TestFilteringConditions(unittest.TestCase):
         # only 1 option left - a->1, b->3!
         self.assertEquals(len(res1), 1)
 
-        # # node a requires target node to have an attribute matching a regex
-        # condy = {'attributes': {'regex': ('a', ('foo', '\w'))}}
-        # res1 = self.cut.stitch(self.container, self.request, conditions=condy)
-        # # only 2 options left!
-        # self.assertEquals(len(res1), 2)
+        # node a requires target node to have an attribute retest which starts
+        # with an 'a'
+        condy = {'attributes': {'regex': ('a', ('retest', '^a'))}}
+        res1 = self.cut.stitch(self.container, self.request, conditions=condy)
+        # only 1 option left - a->1, b->3!
+        self.assertEquals(len(res1), 1)
+
+        # node a requires target node to have an attribute retest which starts
+        # with an 'c'
+        condy = {'attributes': {'regex': ('a', ('retest', '^c'))}}
+        res1 = self.cut.stitch(self.container, self.request, conditions=condy)
+        # no options left.
+        self.assertEquals(len(res1), 0)
 
         self.container.add_node('4', {'type': 'b', 'foo': 'x'})
         self.container.add_edge('3', '4')

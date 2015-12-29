@@ -6,10 +6,13 @@ Visualize possible stitches with the outcome of the validator.
 import matplotlib.pyplot as plt
 import networkx as nx
 
-# TODO: auto scale subplots
+# TODO: auto scale subplots (default 2,4)
+
+TYPE_FORMAT = {'a': '^', 'b': 's', 'c': 'v'}
 
 
-def show(graphs, new_nodes, results, prog='neato', size=(2, 4)):
+def show(graphs, new_nodes, results, prog='neato', size=(2, 4),
+         type_format=None):
     """
     Display the results using matplotlib.
     """
@@ -26,7 +29,10 @@ def show(graphs, new_nodes, results, prog='neato', size=(2, 4)):
         axarr[x_val, y_val].yaxis.set_ticks([])
         axarr[x_val, y_val].set_title(results[index])
         axarr[x_val, y_val].set_axis_bgcolor("white")
-        _plot_sub_plot(candidate, new_nodes, prog, axarr[x_val, y_val])
+        if not type_format:
+            type_format = TYPE_FORMAT
+        _plot_sub_plot(candidate, new_nodes, prog, type_format,
+                       axarr[x_val, y_val])
         y_val += 1
         if y_val > 3:
             y_val = 0
@@ -36,7 +42,7 @@ def show(graphs, new_nodes, results, prog='neato', size=(2, 4)):
     plt.show()
 
 
-def _plot_sub_plot(graph, new_nodes, prog, axes):
+def _plot_sub_plot(graph, new_nodes, prog, type_format, axes):
     """
     Plot a single candidate graph.
     """
@@ -48,12 +54,8 @@ def _plot_sub_plot(graph, new_nodes, prog, axes):
     blue_nodes = []
     for node, values in graph.nodes(data=True):
         shape = 'o'
-        if values['type'] == 'a':
-            shape = '^'
-        if values['type'] == 'b':
-            shape = 's'
-        if values['type'] == 'c':
-            shape = 'v'
+        if values['type'] in type_format:
+            shape = type_format[values['type']]
         color = 'g'
         alpha = 0.8
         if node in new_nodes:

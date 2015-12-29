@@ -87,14 +87,14 @@ The basic filter support the following operations:
 The following dictionary can be passed in as a composition condition:
 
     {
-     "attributes": [('eq', ('a', ('foo', 'y'))),
+     'attributes': [('eq', ('a', ('foo', 'y'))),
                     ('neq', ('a', ('foo', 5))),
                     ('lt', ('a', ('foo', 4))),
                     ('lg', ('a', ('foo', 7))),
                     ('regex', ('a', ('foo', '^a')))],
-     "compositions": [("same", ("1", "2")),
-                      ("diff", ("3", "4")),
-                      ("share", ("group", ["x", "y"]))]
+     'compositions': [('same', ('1', '2')),
+                      ('diff', ('3', '4')),
+                      ('share', ('group', ['x', 'y']))]
     }
 
 graph stitcher is mostly developed to test & play around. Also to check if

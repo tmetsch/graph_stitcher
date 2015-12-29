@@ -65,6 +65,36 @@ class TestFilteringConditions(unittest.TestCase):
         self.assertTrue(len(res1) == 2)
         self.assertTrue(len(res2) == 2)
 
+    def test_complex_filter_for_sanity(self):
+        container = nx.DiGraph()
+        container.add_node('a', {'type': 'a', 'group': '1', 'geo': 'eu'})
+        container.add_node('b', {'type': 'b', 'group': '1'})
+        container.add_node('c', {'type': 'a', 'group': '2'})
+        container.add_node('d', {'type': 'b', 'group': '2'})
+        container.add_edge('a', 'b')
+        container.add_edge('b', 'c')
+        container.add_edge('c', 'd')
+
+        request = nx.DiGraph()
+        request.add_node('1', {'type': 'x'})
+        request.add_node('2', {'type': 'y'})
+        request.add_node('3', {'type': 'y'})
+        request.add_edge('1', '2')
+        request.add_edge('1', '3')
+
+        condy = {'compositions': {'share': ('group', ['1', '2']),
+                                  'same': ('2', '3')},
+                 'attributes': {'1': ('geo', 'eu')}}
+
+        res1 = self.cut.stitch(container, request, conditions=condy)
+
+        # only one option possible
+        self.assertEqual(len(res1), 1)
+        # verify stitches
+        self.assertIn(('1', 'a'), res1[0].edges())
+        self.assertIn(('2', 'b'), res1[0].edges())
+        self.assertIn(('3', 'b'), res1[0].edges())
+
 
 class TestBaseStitcher(unittest.TestCase):
     """

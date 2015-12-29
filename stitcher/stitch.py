@@ -25,27 +25,32 @@ def filter(container, edge_list, conditions):
         rm = []
         if 'attributes' in conditions:
             rm.extend(_attr_filter(container, edge_list, conditions))
-        elif 'compositions' in conditions:
+        if 'compositions' in conditions:
             for condition in conditions['compositions']:
-                n1 = conditions['compositions'][condition][0]
-                n2 = conditions['compositions'][condition][1]
+                para1 = conditions['compositions'][condition][0]
+                para2 = conditions['compositions'][condition][1]
                 if condition is 'same':
-                    rm.extend(_same_filter(n1, n2, edge_list))
-                elif condition is 'diff':
-                    rm.extend(_diff_filter(n1, n2, edge_list))
-
+                    rm.extend(_same_filter(para1, para2, edge_list))
+                if condition is 'diff':
+                    rm.extend(_diff_filter(para1, para2, edge_list))
+                if condition is 'share':
+                    rm.extend(_share_attr(container, para1, para2, edge_list))
         for item in rm:
-            edge_list.remove(item)
+            try:
+                edge_list.remove(item)
+            except ValueError:
+                pass   # multiple filters might request removal.
         return edge_list
 
 
-def _attr_filter(container, edge_list, conditions):
+def _attr_filter(container, candidate_list, conditions):
     """
     Filter on attributes needed on target node.
     """
+    # TODO: support regex?
     rm = []
     for condition in conditions['attributes']:
-        for candidate in edge_list:
+        for candidate in candidate_list:
             for s, t in candidate:
                 attrn = conditions['attributes'][condition][0]
                 attrv = conditions['attributes'][condition][1]
@@ -57,12 +62,13 @@ def _attr_filter(container, edge_list, conditions):
     return rm
 
 
-def _same_filter(n1, n2, edge_list):
+def _same_filter(n1, n2, candidate_list):
     """
-    Filter out edge which do not adhere the same target composition request.
+    Filter out candidates which do not adhere the same target composition
+    request.
     """
     rm = []
-    for candidate in edge_list:
+    for candidate in candidate_list:
         n1_trg = ''
         n2_trg = ''
         for s, t in candidate:
@@ -79,13 +85,13 @@ def _same_filter(n1, n2, edge_list):
     return rm
 
 
-def _diff_filter(n1, n2, edge_list):
+def _diff_filter(n1, n2, candidate_list):
     """
-    Filter out edge which do not adhere the different target composition
+    Filter out candidates which do not adhere the different target composition
     request.
     """
     rm = []
-    for candidate in edge_list:
+    for candidate in candidate_list:
         n1_trg = ''
         n2_trg = ''
         for s, t in candidate:
@@ -99,6 +105,23 @@ def _diff_filter(n1, n2, edge_list):
             elif n2_trg != '' and s == n1:
                 if t == n2_trg:
                     rm.append(candidate)
+    return rm
+
+
+def _share_attr(container, attrn, nlist, candidate_list):
+    """
+    Filter out candidates which do not adhere the request that all target nodes
+    stitched to in the nlist share the same attribute value for a given
+    attribute name.
+    """
+    rm = []
+    for candidate in candidate_list:
+        attrv = ''
+        for s, t in candidate:
+            if s in nlist and attrv == '':
+                 attrv = container.node[t][attrn]
+            elif s in nlist and container.node[t][attrn] != attrv:
+                rm.append(candidate)
     return rm
 
 

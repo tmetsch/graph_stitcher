@@ -62,19 +62,32 @@ To stitch two graphs the tool needs to know how which relationships are needed:
     type_a              | type_x
     ...                 | ...
 
-There is a *filter()* function implemented which can filter based on required
-target attributes (example below: node a requires it's stitched target to have
-an attribute 'foo' with value 'x') or on the notion that two nodes require the
-same or different target (example below: node 1 & 2 need to have the same
-stitched target node):
+These are stored in the file (stitch.json). Sample graphs & tests can be found
+in the **tests** directory as well.
+
+There is a *filter()* function implemented which can do some basic filtering.
+Implementing your own is possible by just pass conditions and the *filter()*
+routine you want to as parameters to the *stich()* call.
+
+The basic filter support the following operations:
+
+  * based on required target attributes - example below: node a requires it's
+    stitched target to have an attribute 'foo' with value 'x'
+  * the notion that two nodes require the same or different target - example
+    below: node 1 & 2 need to have the same stitched target node and node 3 & 4
+    need to have different stitched target nodes.
+  * the request that stitched target nodes share a common attribute - example
+    below: node x & y need to be stitched to target nodes which share the same
+    attribute value for the attribute with the name 'group'.
+
+The following dictionary can be passed in as a composition condition:
 
     {
      "attributes": {"a": ("foo": "x")},
-     "compositions": {"same": ("1", "2")}
+     "compositions": {"same": ("1", "2")},
+                     {"diff": ("3", "4")},
+                     {"share": ("group", ["x", "y"])}}
     }
-
-These are stored in the file (stitch.json). Sample graphs & tests can be found
-in the **tests** directory as well.
 
 graph stitcher is mostly developed to test & play around. Also to check if
 [evolutionary algorithms](https://en.wikipedia.org/wiki/Evolutionary_algorithm)

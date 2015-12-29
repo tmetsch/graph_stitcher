@@ -41,32 +41,34 @@ def my_filter(container, edge_list, conditions):
         rm_list = []
         if 'attributes' in conditions:
             for condition in conditions['attributes']:
-                para1 = conditions['attributes'][condition][0]
-                para2 = conditions['attributes'][condition][1]
-                if condition is 'eq':
+                cond = condition[0]
+                para1 = condition[1][0]
+                para2 = condition[1][1]
+                if cond is 'eq':
                     rm_list.extend(_eq_attr_filter(container, para1, para2,
                                                    edge_list))
-                if condition is 'neq':
+                if cond is 'neq':
                     rm_list.extend(_neq_attr_filter(container, para1, para2,
                                                     edge_list))
-                if condition is 'lg':
+                if cond is 'lg':
                     rm_list.extend(_lg_attr_filter(container, para1, para2,
                                                    edge_list))
-                if condition is 'lt':
+                if cond is 'lt':
                     rm_list.extend(_lt_attr_filter(container, para1, para2,
                                                    edge_list))
-                if condition is 'regex':
+                if cond is 'regex':
                     rm_list.extend(_regex_attr_filter(container, para1, para2,
                                                       edge_list))
         if 'compositions' in conditions:
             for condition in conditions['compositions']:
-                para1 = conditions['compositions'][condition][0]
-                para2 = conditions['compositions'][condition][1]
-                if condition is 'same':
+                cond = condition[0]
+                para1 = condition[1][0]
+                para2 = condition[1][1]
+                if cond is 'same':
                     rm_list.extend(_same_filter(para1, para2, edge_list))
-                if condition is 'diff':
+                if cond is 'diff':
                     rm_list.extend(_diff_filter(para1, para2, edge_list))
-                if condition is 'share':
+                if cond is 'share':
                     rm_list.extend(_share_attr(container, para1, para2,
                                                edge_list))
         for item in rm_list:
@@ -216,7 +218,9 @@ def _share_attr(container, attrn, nlist, candidate_list):
     for candidate in candidate_list:
         attrv = ''
         for src, trg in candidate:
-            if src in nlist and attrv == '':
+            if attrn not in container.node[trg]:
+                res.append(candidate)
+            elif src in nlist and attrv == '':
                 attrv = container.node[trg][attrn]
             elif src in nlist and container.node[trg][attrn] != attrv:
                 res.append(candidate)

@@ -65,9 +65,10 @@ To stitch two graphs the tool needs to know how which relationships are needed:
 These are stored in the file (stitch.json). Sample graphs & tests can be found
 in the **tests** directory as well.
 
-There is a *filter()* function implemented which can do some basic filtering.
-Implementing your own is possible by just pass conditions and the *filter()*
-routine you want to as parameters to the *stich()* call.
+There is a *conditional_filter()* function implemented which can do some basic
+filtering. Implementing your own is possible by passing conditions and the
+*conditional_filter()* routine you want to use as parameters to the *stich()*
+call.
 
 The basic filter support the following operations:
 

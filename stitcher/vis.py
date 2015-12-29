@@ -1,4 +1,7 @@
 
+"""
+Visualize possible stitches with the outcome of the validator.
+"""
 
 import matplotlib.pyplot as plt
 import networkx as nx
@@ -10,30 +13,33 @@ def show(graphs, new_nodes, results, prog='neato', size=(2, 4)):
     """
     Display the results using matplotlib.
     """
-    f, axarr = plt.subplots(size[0], size[1], figsize=(18, 10))
-    f.set_facecolor('white')
-    x = 0
-    y = 0
-    i = 0
+    fig, axarr = plt.subplots(size[0], size[1], figsize=(18, 10))
+    fig.set_facecolor('white')
+    x_val = 0
+    y_val = 0
+    index = 0
     for candidate in graphs:
-        # axarr[x, y].axis('off')
-        axarr[x, y].xaxis.set_major_formatter(plt.NullFormatter())
-        axarr[x, y].yaxis.set_major_formatter(plt.NullFormatter())
-        axarr[x, y].xaxis.set_ticks([])
-        axarr[x, y].yaxis.set_ticks([])
-        axarr[x, y].set_title(results[i])
-        axarr[x, y].set_axis_bgcolor("white")
-        _plot_sub_plot(candidate, new_nodes, prog, axarr[x, y])
-        y += 1
-        if y > 3:
-            y = 0
-            x += 1
-        i += 1
-    f.tight_layout()
+        # axarr[x_val, y_val].axis('off')
+        axarr[x_val, y_val].xaxis.set_major_formatter(plt.NullFormatter())
+        axarr[x_val, y_val].yaxis.set_major_formatter(plt.NullFormatter())
+        axarr[x_val, y_val].xaxis.set_ticks([])
+        axarr[x_val, y_val].yaxis.set_ticks([])
+        axarr[x_val, y_val].set_title(results[index])
+        axarr[x_val, y_val].set_axis_bgcolor("white")
+        _plot_sub_plot(candidate, new_nodes, prog, axarr[x_val, y_val])
+        y_val += 1
+        if y_val > 3:
+            y_val = 0
+            x_val += 1
+        index += 1
+    fig.tight_layout()
     plt.show()
 
 
-def _plot_sub_plot(graph, new_nodes, prog, ax):
+def _plot_sub_plot(graph, new_nodes, prog, axes):
+    """
+    Plot a single candidate graph.
+    """
     pos = nx.graphviz_layout(graph, prog=prog)
 
     green_nodes = []
@@ -58,7 +64,7 @@ def _plot_sub_plot(graph, new_nodes, prog, ax):
         elif 'rank' in values and values['rank'] < 7 and values['rank'] > 3:
             color = 'y'
         nx.draw_networkx_nodes(graph, pos, nodelist=[node], node_color=color,
-                               node_shape=shape, alpha=alpha, ax=ax)
+                               node_shape=shape, alpha=alpha, ax=axes)
 
         if node in new_nodes:
             blue_nodes.append(node)
@@ -72,14 +78,14 @@ def _plot_sub_plot(graph, new_nodes, prog, ax):
     # draw the edges
     dotted_line = []
     normal_line = []
-    for s, t in graph.edges():
-        if s in new_nodes and t not in new_nodes:
-            dotted_line.append((s, t))
+    for src, trg in graph.edges():
+        if src in new_nodes and trg not in new_nodes:
+            dotted_line.append((src, trg))
         else:
-            normal_line.append((s, t))
+            normal_line.append((src, trg))
     nx.draw_networkx_edges(graph, pos, edgelist=dotted_line, style='dotted',
-                           ax=ax)
-    nx.draw_networkx_edges(graph, pos, edgelist=normal_line, ax=ax)
+                           ax=axes)
+    nx.draw_networkx_edges(graph, pos, edgelist=normal_line, ax=axes)
 
     # draw labels
-    nx.draw_networkx_labels(graph, pos, ax=ax)
+    nx.draw_networkx_labels(graph, pos, ax=axes)

@@ -73,6 +73,8 @@ The basic filter support the following operations:
 
   * based on required target attributes - example below: node a requires it's
     stitched target to have an attribute 'foo' with value 'x'
+  * based on attribute comparisons equal, not equal, larger, less than or by a
+    regular expression.
   * the notion that two nodes require the same or different target - example
     below: node 1 & 2 need to have the same stitched target node and node 3 & 4
     need to have different stitched target nodes.
@@ -83,7 +85,11 @@ The basic filter support the following operations:
 The following dictionary can be passed in as a composition condition:
 
     {
-     "attributes": {'equal': ('a', ('foo', 'y'))},
+     "attributes": {'eq': ('a', ('foo', 'y'))},
+                   {'neq': ('a', ('foo', 5))},
+                   {'lt': ('a', ('foo', 4))},
+                   {'lg': ('a', ('foo', 7))},
+                   {'regex': ('a', ('foo', '^a'))},
      "compositions": {"same": ("1", "2")},
                      {"diff": ("3", "4")},
                      {"share": ("group", ["x", "y"])}}

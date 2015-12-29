@@ -38,9 +38,9 @@ class TestFilteringConditions(unittest.TestCase):
 
     def test_filter_for_sanity(self):
         # none given as condition should results input = output
-        input = [1, 2, 3]
-        output = stitch.filter(self.container, [1, 2, 3], None)
-        self.assertEqual(input, output)
+        inp = [1, 2, 3]
+        out = stitch.my_filter(self.container, [1, 2, 3], None)
+        self.assertEqual(inp, out)
 
         # node a requires target node to have attribute foo set to y
         condy = {'attributes': {'eq': ('a', ('foo', 'y'))}}
@@ -177,10 +177,10 @@ class TestBaseStitcher(unittest.TestCase):
         # basic stitch test
         res1 = self.cut.stitch(self.container, self.request)
         self.assertTrue(len(res1) > 0)
-        self.assertTrue(res1[0].number_of_edges()) == \
-            self.container.number_of_edges() + 3
-        self.assertTrue(res1[0].number_of_nodes()) == \
-            self.container.number_of_nodes() + 3
+        self.assertEqual(res1[0].number_of_edges(),
+                         self.container.number_of_edges() + 5)
+        self.assertEqual(res1[0].number_of_nodes(),
+                         self.container.number_of_nodes() + 3)
 
         # let's add a node to the request which does not require to be
         # stitched to the container. Hence added edges = 3!
@@ -189,10 +189,10 @@ class TestBaseStitcher(unittest.TestCase):
         self.request.add_edge('n', 'l')
 
         self.assertTrue(len(res1) > 0)
-        self.assertTrue(res1[0].number_of_edges()) == \
-            self.container.number_of_edges() + 3
-        self.assertTrue(res1[0].number_of_nodes()) == \
-            self.container.number_of_nodes() + 3
+        self.assertEqual(res1[0].number_of_edges(),
+                         self.container.number_of_edges() + 5)
+        self.assertEqual(res1[0].number_of_nodes(),
+                         self.container.number_of_nodes() + 3)
 
 
 class TestIncomingEdgeStitcher(unittest.TestCase):

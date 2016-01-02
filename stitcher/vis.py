@@ -3,19 +3,21 @@
 Visualize possible stitches with the outcome of the validator.
 """
 
+import math
+
 import matplotlib.pyplot as plt
 import networkx as nx
-
-# TODO: auto scale subplots (default 2,4)
 
 TYPE_FORMAT = {'a': '^', 'b': 's', 'c': 'v'}
 
 
-def show(graphs, new_nodes, results, prog='neato', size=(2, 4),
+def show(graphs, new_nodes, results, prog='neato', size=None,
          type_format=None):
     """
     Display the results using matplotlib.
     """
+    if not size:
+        size = _get_size(len(graphs))
     fig, axarr = plt.subplots(size[0], size[1], figsize=(18, 10))
     fig.set_facecolor('white')
     x_val = 0
@@ -34,7 +36,7 @@ def show(graphs, new_nodes, results, prog='neato', size=(2, 4),
         _plot_sub_plot(candidate, new_nodes, prog, type_format,
                        axarr[x_val, y_val])
         y_val += 1
-        if y_val > size[1] -1:
+        if y_val > size[1] - 1:
             y_val = 0
             x_val += 1
         index += 1
@@ -91,3 +93,14 @@ def _plot_sub_plot(graph, new_nodes, prog, type_format, axes):
 
     # draw labels
     nx.draw_networkx_labels(graph, pos, ax=axes)
+
+
+def _get_size(n_items):
+    """
+    Calculate the size of the subplot layouts based on number of items.
+    """
+    n_cols = math.ceil(math.ceil(math.sqrt(n_items)))
+    n_rows = math.ceil(math.floor(math.sqrt(n_items)))
+    if n_cols * n_rows < n_items:
+        n_cols += 1
+    return int(n_rows), int(n_cols)

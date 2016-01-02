@@ -300,7 +300,7 @@ class BaseStitcher(object):
         :param graphs: List of possible graphs
         :return: dict with int:str.
         """
-        # TODO: allow for chaining of validators & stitchers
+        # XXX: allow for chaining of validators & stitchers
         raise NotImplementedError('Needs to be implemented...')
 
 

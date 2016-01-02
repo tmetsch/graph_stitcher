@@ -34,7 +34,7 @@ def show(graphs, new_nodes, results, prog='neato', size=(2, 4),
         _plot_sub_plot(candidate, new_nodes, prog, type_format,
                        axarr[x_val, y_val])
         y_val += 1
-        if y_val > 3:
+        if y_val > size[1] -1:
             y_val = 0
             x_val += 1
         index += 1

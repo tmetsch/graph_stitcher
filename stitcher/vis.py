@@ -99,8 +99,8 @@ def _get_size(n_items):
     """
     Calculate the size of the subplot layouts based on number of items.
     """
-    n_cols = math.ceil(math.ceil(math.sqrt(n_items)))
-    n_rows = math.ceil(math.floor(math.sqrt(n_items)))
+    n_cols = math.ceil(math.sqrt(n_items))
+    n_rows = math.floor(math.sqrt(n_items))
     if n_cols * n_rows < n_items:
         n_cols += 1
     return int(n_rows), int(n_cols)

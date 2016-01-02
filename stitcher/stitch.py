@@ -5,6 +5,7 @@ Implements stitching, validation and filtering functions.
 
 import itertools
 import json
+import os
 import re
 
 import networkx as nx
@@ -232,7 +233,10 @@ class BaseStitcher(object):
     Base stitcher with the function which need to be implemented.
     """
 
-    def __init__(self, filename='data/stitch.json'):
+    def __init__(self, filename=None):
+        if filename is None:
+            filename = os.path.dirname(os.path.abspath(__file__)) + os.sep + \
+                       '..' + os.sep + 'data' + os.sep + 'stitch.json'
         self.rels = json.load(open(filename, 'r'))
 
     def stitch(self, container, request, conditions=None,

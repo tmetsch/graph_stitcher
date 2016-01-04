@@ -296,12 +296,13 @@ class BaseStitcher(object):
             res.append(candidate_graph)
         return res
 
-    def validate(self, graphs):
+    def validate(self, graphs, param=None):
         """
         Validate a set of graphs from the stitch() function. Return a
         dictionary with the index & explanatory text.
 
         :param graphs: List of possible graphs
+        :param param: Parameters for this validator.
         :return: dict with int:str.
         """
         # XXX: allow for chaining of validators & stitchers
@@ -313,7 +314,7 @@ class IncomingEdgeStitcher(BaseStitcher):
     Implemented simple rule to validate based on # of incoming edges.
     """
 
-    def validate(self, graphs, condition={}):
+    def validate(self, graphs, param={}):
         """
         In case a node of a certain type has more then a threshold of incoming
         edges determine a possible stitches as a bad stitch.
@@ -323,10 +324,10 @@ class IncomingEdgeStitcher(BaseStitcher):
         for candidate in graphs:
             res[i] = 'ok'
             for node, values in candidate.nodes(data=True):
-                if values['type'] not in condition.keys():
+                if values['type'] not in param.keys():
                     continue
                 else:
-                    tmp = condition[values['type']]
+                    tmp = param[values['type']]
                 if len(candidate.in_edges(node)) >= tmp:
                     res[i] = 'node ' + str(node) + ' has to many edges: ' + \
                              str(len(candidate.in_edges(node)))
@@ -340,7 +341,7 @@ class NodeRankStitcher(BaseStitcher):
     of a node.
     """
 
-    def validate(self, graphs, condition={}):
+    def validate(self, graphs, param={}):
         """
         In case a rank of a node and # of incoming edges increases determine
         possible stitches as a bad stitch.
@@ -350,10 +351,10 @@ class NodeRankStitcher(BaseStitcher):
         for candidate in graphs:
             res[i] = 'ok'
             for node, values in candidate.nodes(data=True):
-                if values['type'] not in condition.keys():
+                if values['type'] not in param.keys():
                     continue
                 else:
-                    tmp = condition[values['type']]
+                    tmp = param[values['type']]
                 if len(candidate.in_edges(node)) >= tmp[0] \
                         and values['rank'] >= tmp[1]:
                     res[i] = 'node ' + str(node) + ' has a high rank.'

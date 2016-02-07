@@ -141,6 +141,7 @@ class TestFilteringConditions(unittest.TestCase):
                  'attributes': [('eq', ('1', ('geo', 'eu')))]}
 
         res1 = self.cut.stitch(container, request, conditions=condy)
+        print res1
 
         # only one option possible
         self.assertEqual(len(res1), 1)
@@ -221,7 +222,12 @@ class TestIncomingEdgeStitcher(unittest.TestCase):
         res2 = self.cut.validate(res1, {'b': 5})
 
         self.assertTrue(len(res2) == 8)
-        self.assertTrue(res2[0] == 'node C has to many edges: 5')
+        # 4 are ok & 4 are stupid
+        count = 0
+        for item in res2:
+            if res2[item] != 'ok':
+                count += 1
+        self.assertEqual(count, 4)
 
 
 class TestNodeRankSticher(unittest.TestCase):

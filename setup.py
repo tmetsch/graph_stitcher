@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='graph_stitcher',
-      version='0.0.4',
+      version='0.0.5',
       author='Thijs Metsch',
       url='https://github.com/tmetsch/graph_stitcher',
       description=('This tool is a little framework to determine possible'

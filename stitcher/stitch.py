@@ -270,7 +270,7 @@ class BaseStitcher(object):
         :return: The resulting graphs(s).
         """
         res = []
-        # TODO: optimize this
+        # TODO: optimize this using concurrency & parallelism
 
         # 1. find possible mappings
         tmp = {}

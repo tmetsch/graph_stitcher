@@ -23,6 +23,10 @@ def show(graphs, new_nodes, results, prog='neato', size=None,
     x_val = 0
     y_val = 0
     index = 0
+
+    if size[0] == 1:
+        axarr = axarr.reshape((1, 3))
+
     for candidate in graphs:
         # axarr[x_val, y_val].axis('off')
         axarr[x_val, y_val].xaxis.set_major_formatter(plt.NullFormatter())

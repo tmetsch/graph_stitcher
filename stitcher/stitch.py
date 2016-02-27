@@ -286,7 +286,7 @@ class BaseStitcher(object):
         # 2. find candidates
         # dictionary so we have hashed keys (--> speed)
         candidate_edges = {}
-        keys = tmp.keys()
+        keys = list(tmp.keys())
         per = []
         for key in keys:
             per.append(tmp[key])

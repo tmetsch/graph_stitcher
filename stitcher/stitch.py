@@ -39,6 +39,7 @@ def my_filter(container, edge_list, conditions):
     if conditions is None:
         return edge_list
     else:
+        tmp = []
         rm_list = {}
         if 'attributes' in conditions:
             for condition in conditions['attributes']:
@@ -46,37 +47,26 @@ def my_filter(container, edge_list, conditions):
                 para1 = condition[1][0]
                 para2 = condition[1][1]
                 if cond is 'eq':
-                    rm_list.update(_eq_attr_filter(container, para1, para2,
-                                                   edge_list))
+                    _eq_attr_filter(container, para1, para2, edge_list)
                 if cond is 'neq':
-                    rm_list.update(_neq_attr_filter(container, para1, para2,
-                                                    edge_list))
+                    _neq_attr_filter(container, para1, para2, edge_list)
                 if cond is 'lg':
-                    rm_list.update(_lg_attr_filter(container, para1, para2,
-                                                   edge_list))
+                    _lg_attr_filter(container, para1, para2, edge_list)
                 if cond is 'lt':
-                    rm_list.update(_lt_attr_filter(container, para1, para2,
-                                                   edge_list))
+                    _lt_attr_filter(container, para1, para2, edge_list)
                 if cond is 'regex':
-                    rm_list.update(_regex_attr_filter(container, para1, para2,
-                                                      edge_list))
+                    _regex_attr_filter(container, para1, para2, edge_list)
         if 'compositions' in conditions:
             for condition in conditions['compositions']:
                 cond = condition[0]
                 para1 = condition[1][0]
                 para2 = condition[1][1]
                 if cond is 'same':
-                    rm_list.update(_same_filter(para1, para2, edge_list))
+                    _same_filter(para1, para2, edge_list)
                 if cond is 'diff':
-                    rm_list.update(_diff_filter(para1, para2, edge_list))
+                    _diff_filter(para1, para2, edge_list)
                 if cond is 'share':
-                    rm_list.update(_share_attr(container, para1, para2,
-                                               edge_list))
-        for item in rm_list:
-            try:
-                edge_list.pop(item)
-            except ValueError:
-                pass   # multiple filters might request removal.
+                    _share_attr(container, para1, para2, edge_list)
         return edge_list
 
 
@@ -84,92 +74,82 @@ def _eq_attr_filter(container, node, condition, candidate_list):
     """
     Filter on attributes needed on target node.
     """
-    res = {}
-    for candidate in candidate_list.values():
+    for candidate in list(candidate_list.keys()):
         attrn = condition[0]
         attrv = condition[1]
-        for src, trg in candidate:
+        for src, trg in candidate_list[candidate]:
             if src == node and attrn not in container.node[trg]:
-                res[str(candidate)] = candidate
+                candidate_list.pop(candidate)
                 break
             if src == node and attrn in container.node[trg] \
                     and attrv != container.node[trg][attrn]:
-                res[str(candidate)] = candidate
+                candidate_list.pop(candidate)
                 break
-    return res
 
 
 def _neq_attr_filter(container, node, condition, candidate_list):
     """
     Filter on attributes unequal to requested value.
     """
-    res = {}
-    for candidate in candidate_list.values():
+    for candidate in list(candidate_list.keys()):
         attrn = condition[0]
         attrv = condition[1]
-        for src, trg in candidate:
+        for src, trg in candidate_list[candidate]:
             if src == node and attrn in container.node[trg] \
                     and attrv == container.node[trg][attrn]:
-                res[str(candidate)] = candidate
+                candidate_list.pop(candidate)
                 break
-    return res
 
 
 def _lg_attr_filter(container, node, condition, candidate_list):
     """
     Filter on attributes larger than requested value.
     """
-    res = {}
-    for candidate in candidate_list.values():
+    for candidate in list(candidate_list.keys()):
         attrn = condition[0]
         attrv = condition[1]
-        for src, trg in candidate:
+        for src, trg in candidate_list[candidate]:
             if src == node and attrn not in container.node[trg]:
-                res[str(candidate)] = candidate
+                candidate_list.pop(candidate)
                 break
             if src == node and attrn in container.node[trg] \
                     and attrv > container.node[trg][attrn]:
-                res[str(candidate)] = candidate
+                candidate_list.pop(candidate)
                 break
-    return res
 
 
 def _lt_attr_filter(container, node, condition, candidate_list):
     """
     Filter on attributes less than requested value.
     """
-    res = {}
-    for candidate in candidate_list.values():
+    for candidate in list(candidate_list.keys()):
         attrn = condition[0]
         attrv = condition[1]
-        for src, trg in candidate:
+        for src, trg in candidate_list[candidate]:
             if src == node and attrn not in container.node[trg]:
-                res[str(candidate)] = candidate
+                candidate_list.pop(candidate)
                 break
             if src == node and attrn in container.node[trg] \
                     and attrv < container.node[trg][attrn]:
-                res[str(candidate)] = candidate
+                candidate_list.pop(candidate)
                 break
-    return res
 
 
 def _regex_attr_filter(container, node, condition, candidate_list):
     """
     Filter on attributes which match an regex.
     """
-    res = {}
-    for candidate in candidate_list.values():
+    for candidate in list(candidate_list.keys()):
         attrn = condition[0]
         regex = condition[1]
-        for src, trg in candidate:
+        for src, trg in candidate_list[candidate]:
             if src == node and attrn not in container.node[trg]:
-                res[str(candidate)] = candidate
+                candidate_list.pop(candidate)
                 break
             if src == node and attrn in container.node[trg] \
                     and not re.search(regex, container.node[trg][attrn]):
-                res[str(candidate)] = candidate
+                candidate_list.pop(candidate)
                 break
-    return res
 
 
 def _same_filter(node1, node2, candidate_list):
@@ -177,24 +157,22 @@ def _same_filter(node1, node2, candidate_list):
     Filter out candidates which do not adhere the same target composition
     request.
     """
-    res = {}
-    for candidate in candidate_list.values():
+    for candidate in list(candidate_list.keys()):
         n1_trg = ''
         n2_trg = ''
-        for src, trg in candidate:
+        for src, trg in candidate_list[candidate]:
             if n1_trg == '' and src == node1:
                 n1_trg = trg
             elif n1_trg != '' and src == node2:
                 if trg != n1_trg:
-                    res[str(candidate)] = candidate
+                    candidate_list.pop(candidate)
                     break
             if n2_trg == '' and src == node2:
                 n2_trg = trg
             elif n2_trg != '' and src == node1:
                 if trg != n2_trg:
-                    res[str(candidate)] = candidate
+                    candidate_list.pop(candidate)
                     break
-    return res
 
 
 def _diff_filter(node1, node2, candidate_list):
@@ -202,25 +180,22 @@ def _diff_filter(node1, node2, candidate_list):
     Filter out candidates which do not adhere the different target composition
     request.
     """
-    res = {}
-    for candidate in candidate_list.values():
+    for candidate in list(candidate_list.keys()):
         n1_trg = ''
         n2_trg = ''
-        for src, trg in candidate:
+        for src, trg in candidate_list[candidate]:
             if n1_trg == '' and src == node1:
                 n1_trg = trg
             elif n1_trg != '' and src == node2:
                 if trg == n1_trg:
-                    res[str(candidate)] = candidate
+                    candidate_list.pop(candidate)
                     break
             if n2_trg == '' and src == node2:
                 n2_trg = trg
             elif n2_trg != '' and src == node1:
                 if trg == n2_trg:
-                    res[str(candidate)] = candidate
+                    candidate_list.pop(candidate)
                     break
-    return res
-
 
 def _share_attr(container, attrn, nlist, candidate_list):
     """
@@ -228,19 +203,17 @@ def _share_attr(container, attrn, nlist, candidate_list):
     stitched to in the nlist share the same attribute value for a given
     attribute name.
     """
-    res = {}
-    for candidate in candidate_list.values():
+    for candidate in list(candidate_list.keys()):
         attrv = ''
-        for src, trg in candidate:
+        for src, trg in candidate_list[candidate]:
             if attrn not in container.node[trg]:
-                res[str(candidate)] = candidate
+                candidate_list.pop(candidate)
                 break
             elif src in nlist and attrv == '':
                 attrv = container.node[trg][attrn]
             elif src in nlist and container.node[trg][attrn] != attrv:
-                res[str(candidate)] = candidate
+                candidate_list.pop(candidate)
                 break
-    return res
 
 
 class BaseStitcher(object):

@@ -197,6 +197,7 @@ def _diff_filter(node1, node2, candidate_list):
                     candidate_list.pop(candidate)
                     break
 
+
 def _share_attr(container, attrn, nlist, candidate_list):
     """
     Filter out candidates which do not adhere the request that all target nodes

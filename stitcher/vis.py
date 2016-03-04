@@ -25,7 +25,7 @@ def show(graphs, new_nodes, results, prog='neato', size=None,
     index = 0
 
     if size[0] == 1:
-        axarr = axarr.reshape((1, 3))
+        axarr = axarr.reshape((1, size[1]))
 
     for candidate in graphs:
         # axarr[x_val, y_val].axis('off')

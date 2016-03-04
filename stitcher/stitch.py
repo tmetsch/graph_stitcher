@@ -1,8 +1,8 @@
-
 """
 Implements stitching, validation and filtering functions.
 """
 
+import copy
 import itertools
 import json
 import os
@@ -39,8 +39,6 @@ def my_filter(container, edge_list, conditions):
     if conditions is None:
         return edge_list
     else:
-        tmp = []
-        rm_list = {}
         if 'attributes' in conditions:
             for condition in conditions['attributes']:
                 cond = condition[0]
@@ -261,9 +259,7 @@ class BaseStitcher(object):
         # dictionary so we have hashed keys (--> speed)
         candidate_edges = {}
         keys = list(tmp.keys())
-        per = []
-        for key in keys:
-            per.append(tmp[key])
+        per = [tmp[key] for key in keys]
 
         for edge_list in itertools.product(*per):
             j = 0
@@ -281,7 +277,8 @@ class BaseStitcher(object):
         # 4. create candidate containers
         tmp_graph = nx.union(container, request)
         for item in candidate_edges.values():
-            candidate_graph = tmp_graph.copy()
+            candidate_graph = copy.deepcopy(tmp_graph)  # faster graph copy
+            # candidate_graph = tmp_graph.copy()
             for src, trg in item:
                 candidate_graph.add_edge(src, trg)
             res.append(candidate_graph)
@@ -305,11 +302,12 @@ class IncomingEdgeStitcher(BaseStitcher):
     Implemented simple rule to validate based on # of incoming edges.
     """
 
-    def validate(self, graphs, param={}):
+    def validate(self, graphs, param=None):
         """
         In case a node of a certain type has more then a threshold of incoming
         edges determine a possible stitches as a bad stitch.
         """
+        param = param or {}
         res = {}
         i = 0
         for candidate in graphs:
@@ -332,11 +330,12 @@ class NodeRankStitcher(BaseStitcher):
     of a node.
     """
 
-    def validate(self, graphs, param={}):
+    def validate(self, graphs, param=None):
         """
         In case a rank of a node and # of incoming edges increases determine
         possible stitches as a bad stitch.
         """
+        param = param or {}
         res = {}
         i = 0
         for candidate in graphs:
@@ -346,8 +345,10 @@ class NodeRankStitcher(BaseStitcher):
                     continue
                 else:
                     tmp = param[values['type']]
-                if len(candidate.in_edges(node)) >= tmp[0] \
+                if len(candidate.in_edges(node)) > tmp[0] \
                         and values['rank'] >= tmp[1]:
-                    res[i] = 'node ' + str(node) + ' has a high rank.'
+                    res[i] = 'node ' + str(node) + ' rank is >= ' + \
+                             str(tmp[1]) + ' and # incoming edges is > ' \
+                             + str(tmp[0])
             i += 1
         return res

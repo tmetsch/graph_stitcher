@@ -253,7 +253,8 @@ class TestNodeRankSticher(unittest.TestCase):
 
     def test_validate_for_sanity(self):
         res1 = self.cut.stitch(self.container, self.request)
-        res2 = self.cut.validate(res1, {'a': (1, 4)})
+        res2 = self.cut.validate(res1, {'a': (0, 3)})
 
         self.assertTrue(len(res2) == 8)
-        self.assertTrue(res2[4] == 'node B has a high rank.')
+        self.assertEquals(res2[4],
+                          'node B rank is >= 3 and # incoming edges is > 0')

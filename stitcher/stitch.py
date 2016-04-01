@@ -44,26 +44,26 @@ def my_filter(container, edge_list, conditions):
                 cond = condition[0]
                 para1 = condition[1][0]
                 para2 = condition[1][1]
-                if cond is 'eq':
+                if cond == 'eq':
                     _eq_attr_filter(container, para1, para2, edge_list)
-                if cond is 'neq':
+                if cond == 'neq':
                     _neq_attr_filter(container, para1, para2, edge_list)
-                if cond is 'lg':
+                if cond == 'lg':
                     _lg_attr_filter(container, para1, para2, edge_list)
-                if cond is 'lt':
+                if cond == 'lt':
                     _lt_attr_filter(container, para1, para2, edge_list)
-                if cond is 'regex':
+                if cond == 'regex':
                     _regex_attr_filter(container, para1, para2, edge_list)
         if 'compositions' in conditions:
             for condition in conditions['compositions']:
                 cond = condition[0]
                 para1 = condition[1][0]
                 para2 = condition[1][1]
-                if cond is 'same':
+                if cond == 'same':
                     _same_filter(para1, para2, edge_list)
-                if cond is 'diff':
+                if cond == 'diff':
                     _diff_filter(para1, para2, edge_list)
-                if cond is 'share':
+                if cond == 'share':
                     _share_attr(container, para1, para2, edge_list)
         return edge_list
 

@@ -54,10 +54,7 @@ def _plot_sub_plot(graph, new_nodes, prog, type_format, axes):
     """
     pos = nx.graphviz_layout(graph, prog=prog)
 
-    green_nodes = []
-    yellow_nodes = []
-    red_nodes = []
-    blue_nodes = []
+    # draw the nodes
     for node, values in graph.nodes(data=True):
         shape = 'o'
         if values['type'] in type_format:
@@ -73,15 +70,6 @@ def _plot_sub_plot(graph, new_nodes, prog, type_format, axes):
             color = 'y'
         nx.draw_networkx_nodes(graph, pos, nodelist=[node], node_color=color,
                                node_shape=shape, alpha=alpha, ax=axes)
-
-        if node in new_nodes:
-            blue_nodes.append(node)
-        elif 'rank' in values and values['rank'] > 7:
-            red_nodes.append(node)
-        elif 'rank' in values and values['rank'] < 7 and values['rank'] > 3:
-            yellow_nodes.append(node)
-        else:
-            green_nodes.append(node)
 
     # draw the edges
     dotted_line = []

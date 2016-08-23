@@ -1,11 +1,10 @@
 
-from stitcher import stitch
-
-from networkx.readwrite import json_graph
-
 import json
 import unittest
 import networkx as nx
+
+from stitcher import stitch
+from networkx.readwrite import json_graph
 
 
 class TestFilteringConditions(unittest.TestCase):

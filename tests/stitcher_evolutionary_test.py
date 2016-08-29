@@ -58,12 +58,11 @@ class TestBasicEvolution(unittest.TestCase):
         Test basic evolutionary algorithm usage for failure.
         """
         population = _get_population('x')
-        iter, pop = self.cut.run(population, 100)
-        self.assertEquals(iter, 1)  # should die in second run, 1st = mutate
+        iterations, _ = self.cut.run(population, 100, stabilizer=True)
+        self.assertEquals(iterations, 1)  # should die in second run, 1st = mutate
 
-        iter, pop = self.cut.run(population, 0)
-        self.assertEquals(iter, 1)  # should die in second run, 1st = mutate
-
+        iterations, _ = self.cut.run(population, 0)
+        self.assertEquals(iterations, 1)
 
     def test_run_for_sanity(self):
         """
@@ -71,7 +70,7 @@ class TestBasicEvolution(unittest.TestCase):
         """
         population = _get_population('b')
         iteration, _ = self.cut.run(population, 1)
-        self.assertEquals(iteration, 0)
+        self.assertEquals(iteration, 0)  # done as we flip to b immediately.
 
 
 def _get_population(value):

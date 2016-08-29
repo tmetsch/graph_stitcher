@@ -111,7 +111,7 @@ def _lg_attr_filter(container, node, condition, candidate_list):
                 candidate_list.pop(candidate)
                 break
             if src == node and attrn in container.node[trg] \
-                    and attrv > container.node[trg][attrn]:
+                    and container.node[trg][attrn] <= attrv:
                 candidate_list.pop(candidate)
                 break
 

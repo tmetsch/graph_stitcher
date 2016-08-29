@@ -3,8 +3,9 @@ import json
 import unittest
 import networkx as nx
 
-from stitcher import stitch
 from networkx.readwrite import json_graph
+
+from stitcher import stitch
 
 
 class TestFilteringConditions(unittest.TestCase):
@@ -46,36 +47,60 @@ class TestFilteringConditions(unittest.TestCase):
         res1 = self.cut.stitch(self.container, self.request, conditions=condy)
         # only 1 option left - a->2, b->3!
         self.assertEquals(len(res1), 1)
+        self.assertItemsEqual([('1', '2'), ('a', 'b'), ('2', '3'), ('b', '3'),
+                               ('a', '2')], res1[0].edges())
 
         # node a requires target node to have attribute foo set to 5
         condy = {'attributes': [('eq', ('a', ('bar', 5)))]}
         res1 = self.cut.stitch(self.container, self.request, conditions=condy)
         # only 1 option left - a->1, b->3!
         self.assertEquals(len(res1), 1)
+        self.assertItemsEqual([('1', '2'), ('a', 'b'), ('2', '3'), ('b', '3'),
+                               ('a', '1')], res1[0].edges())
 
         # node a requires target node to have attribute foo not set to y
         condy = {'attributes': [('neq', ('a', ('foo', 'y')))]}
         res1 = self.cut.stitch(self.container, self.request, conditions=condy)
         # only 1 option left - a->1, b->3!
         self.assertEquals(len(res1), 1)
+        self.assertItemsEqual([('1', '2'), ('a', 'b'), ('2', '3'), ('b', '3'),
+                               ('a', '1')], res1[0].edges())
 
         # node a requires target node to have attribute foo not set to 5
         condy = {'attributes': [('neq', ('a', ('bar', 5)))]}
         res1 = self.cut.stitch(self.container, self.request, conditions=condy)
         # only 1 option left - a->2, b->3!
         self.assertEquals(len(res1), 1)
+        self.assertItemsEqual([('1', '2'), ('a', 'b'), ('2', '3'), ('b', '3'),
+                               ('a', '2')], res1[0].edges())
 
-        # node a requires target node to have an attribute foo with value > 5
-        condy = {'attributes': [('lg', ('a', ('bar', 6)))]}
+        # node a requires target node to have an attribute bar with value > 5
+        condy = {'attributes': [('lg', ('a', ('bar', 5)))]}
         res1 = self.cut.stitch(self.container, self.request, conditions=condy)
         # only 1 option left - a->2, b->3!
         self.assertEquals(len(res1), 1)
+        self.assertItemsEqual([('1', '2'), ('a', 'b'), ('2', '3'), ('b', '3'),
+                               ('a', '2')], res1[0].edges())
 
-        # node a requires target node to have an attribute foo with value < 5
+        # node a requires target node to have an attribute xyz with value > 5
+        condy = {'attributes': [('lg', ('a', ('xyz', 5)))]}
+        res1 = self.cut.stitch(self.container, self.request, conditions=condy)
+        # no stitch possible
+        self.assertEquals(len(res1), 0)
+
+        # node a requires target node to have an attribute bar with value < 6
         condy = {'attributes': [('lt', ('a', ('bar', 6)))]}
         res1 = self.cut.stitch(self.container, self.request, conditions=condy)
         # only 1 option left - a->1, b->3!
         self.assertEquals(len(res1), 1)
+        self.assertItemsEqual([('1', '2'), ('a', 'b'), ('2', '3'), ('b', '3'),
+                               ('a', '1')], res1[0].edges())
+
+        # node a requires target node to have an attribute xyz with value < 5
+        condy = {'attributes': [('lt', ('a', ('xyz', 5)))]}
+        res1 = self.cut.stitch(self.container, self.request, conditions=condy)
+        # no stitch possible
+        self.assertEquals(len(res1), 0)
 
         # node a requires target node to have an attribute retest which starts
         # with an 'a'
@@ -83,6 +108,8 @@ class TestFilteringConditions(unittest.TestCase):
         res1 = self.cut.stitch(self.container, self.request, conditions=condy)
         # only 1 option left - a->1, b->3!
         self.assertEquals(len(res1), 1)
+        self.assertItemsEqual([('1', '2'), ('a', 'b'), ('2', '3'), ('b', '3'),
+                               ('a', '1')], res1[0].edges())
 
         # node a requires target node to have an attribute retest which starts
         # with an 'c'
@@ -106,6 +133,15 @@ class TestFilteringConditions(unittest.TestCase):
         # only 2 options left: b&c->3 or b&c->4
         self.assertEquals(len(res1), 2)
         self.assertEquals(len(res2), 2)
+        # should be identical.
+        self.assertItemsEqual(res1[0].edges(), res2[0].edges())
+        self.assertItemsEqual(res1[1].edges(), res2[1].edges())
+        self.assertItemsEqual([('a', '1'), ('a', 'b'), ('b', 'c'), ('1', '2'),
+                               ('3', '4'), ('2', '3'), ('b', '3'), ('c', '3')],
+                              res1[0].edges())
+        self.assertItemsEqual([('a', '1'), ('a', 'b'), ('b', 'c'), ('1', '2'),
+                               ('3', '4'), ('2', '3'), ('b', '4'), ('c', '4')],
+                              res1[1].edges())
 
         # node a & b to be stitched to different targets!
         condy = {'compositions': [('diff', ('b', 'c'))],
@@ -117,6 +153,15 @@ class TestFilteringConditions(unittest.TestCase):
         # only 2 options left: b->3 & c->4 or b->4 & c->3
         self.assertEquals(len(res1), 2)
         self.assertEquals(len(res2), 2)
+        # should be identical.
+        self.assertItemsEqual(res1[0].edges(), res2[0].edges())
+        self.assertItemsEqual(res1[1].edges(), res2[1].edges())
+        self.assertItemsEqual([('a', '1'), ('a', 'b'), ('b', 'c'), ('1', '2'),
+                               ('3', '4'), ('2', '3'), ('b', '4'), ('c', '3')],
+                              res1[0].edges())
+        self.assertItemsEqual([('a', '1'), ('a', 'b'), ('b', 'c'), ('1', '2'),
+                               ('3', '4'), ('2', '3'), ('b', '3'), ('c', '4')],
+                              res1[1].edges())
 
     def test_complex_filter_for_sanity(self):
         container = nx.DiGraph()
@@ -124,6 +169,7 @@ class TestFilteringConditions(unittest.TestCase):
         container.add_node('b', {'type': 'b', 'group': '1'})
         container.add_node('c', {'type': 'a', 'group': '2'})
         container.add_node('d', {'type': 'b', 'group': '2'})
+        container.add_node('e', {'type': 'b'})
         container.add_edge('a', 'b')
         container.add_edge('b', 'c')
         container.add_edge('c', 'd')
@@ -140,7 +186,6 @@ class TestFilteringConditions(unittest.TestCase):
                  'attributes': [('eq', ('1', ('geo', 'eu')))]}
 
         res1 = self.cut.stitch(container, request, conditions=condy)
-        print res1
 
         # only one option possible
         self.assertEqual(len(res1), 1)

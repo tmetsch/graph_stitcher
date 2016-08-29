@@ -52,13 +52,13 @@ class BasicEvolution(object):
         """
         Initialize.
 
-        :param percent_cutoff: Which top percentage of the population to take.
-        :param percent_diversity: Which percentage of population to randomly
-            add from the unfit population portion - keeps diversity up.
+        :param percent_cutoff: Which top percentage of the population survives.
+        :param percent_diversity: Which percentage to randomly add from the
+            unfit population portion - keeps diversity up.
         :param percent_mutate: Percentage of the new population which should
             mutate randomly.
-        :param growth: growth percentage of the population to indicate
-            grow/shrink.
+        :param growth: growth percentage of the new population to indicate
+            growth/shrinking.
         """
         self.cutoff = percent_cutoff
         self.diversity = percent_diversity
@@ -70,11 +70,10 @@ class BasicEvolution(object):
         Evolve the population - the strongest survive and some randomly picked
         will survive. A certain percentage will mutate.
 
-        :param population: Population list.
+        :param population: Population list sorted by fitness.
         :return: List of candidates
         """
         # best possible parents
-        population.sort(key=lambda candidate: candidate.fitness())
         new_population = population[0:int(len(population) * self.cutoff)]
         div_pool = population[int(len(population) * self.cutoff):-1]
 
@@ -98,38 +97,44 @@ class BasicEvolution(object):
             new_population.append(child)
 
         LOG.debug('New population length: ' + str(len(new_population)))
-        new_population.sort(key=lambda candidate: candidate.fitness())
         return new_population
 
-    def run(self, population, max_runs):
+    def run(self, population, max_runs, fitness_goal=0.0, stabilizer=False):
         """
-        Play the game of evolution.
+        Play the game of life.
 
         :param population: The initial population.
-        :param max: Maximum number of iteration (default will run till goal is
-            reached).
-        :return: The final population.
+        :param max_runs: Maximum number of iterations.
+        :param fitness_goal: Breakoff value for fitness - default 0.0
+        :param stabilizer: If True iteration will break off after population
+            stabilizes - comes with a slight performance penalty. Note: only
+            useful when the population has a stable length (growth=1.0) :-).
+        :return: Number of iterations used and the final population.
         """
         # evolve till max iter, 0.0 (goal) or all death
         iteration = 0
         fitness_sum = 0.0
-        done = False
-        while iteration <= max_runs and not done:
-            LOG.debug('Population: ' + repr(population))
+        population.sort(key=lambda candidate: candidate.fitness())
+        while iteration <= max_runs:
             LOG.debug('Iteration: ' + str(iteration))
-            new_fitness_sum = sum(candidate.fitness() for
-                                  candidate in population)
-            population = self._darwin(population)
 
-            if population[0].fitness() == 0.0:
+            population = self._darwin(population)
+            population.sort(key=lambda candidate: candidate.fitness())
+
+            if population[0].fitness() == fitness_goal:
                 LOG.info('Found solution in iteration: ' + str(iteration))
                 break
-            if new_fitness_sum == fitness_sum:
-                # in the last solution all died...
-                LOG.info('Population stabilized after iteration: ' +
-                         str(iteration - 1))
-                break
-            fitness_sum = new_fitness_sum
+
+            if stabilizer:
+                new_fitness_sum = sum(candidate.fitness() for
+                                      candidate in population)
+                if new_fitness_sum == fitness_sum:
+                    # in the last solution all died...
+                    LOG.info('Population stabilized after iteration: ' +
+                             str(iteration - 1))
+                    break
+                fitness_sum = new_fitness_sum
+
             iteration += 1
 
         # show results

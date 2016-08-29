@@ -7,6 +7,7 @@ import math
 
 import matplotlib.pyplot as plt
 import networkx as nx
+import numpy as np
 
 TYPE_FORMAT = {'a': '^', 'b': 's', 'c': 'v'}
 
@@ -25,7 +26,7 @@ def show(graphs, new_nodes, results, prog='neato', size=None,
     index = 0
 
     if size[0] == 1:
-        axarr = axarr.reshape((1, size[1]))
+        axarr = np.array(axarr).reshape((1, size[1]))
 
     for candidate in graphs:
         # axarr[x_val, y_val].axis('off')
@@ -52,7 +53,7 @@ def _plot_sub_plot(graph, new_nodes, prog, type_format, axes):
     """
     Plot a single candidate graph.
     """
-    pos = nx.graphviz_layout(graph, prog=prog)
+    pos = nx.nx_agraph.graphviz_layout(graph, prog=prog)
 
     # draw the nodes
     for node, values in graph.nodes(data=True):

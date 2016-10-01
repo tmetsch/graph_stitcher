@@ -55,7 +55,7 @@ As mentioned above graph stitcher is pluggable, to test different algorithms of
 interface for the *stitch()* and *validate()* routine (see *BaseStitcher*
 class).
 
-To stitch two graphs the tool needs to know how which relationships are needed:
+To stitch two graphs the tool needs to know which relationships are needed:
 
     Type of source node | Type of target node
     -----------------------------------------
@@ -97,7 +97,7 @@ The following dictionary can be passed in as a composition condition:
                       ('share', ('group', ['x', 'y']))]
     }
 
-graph stitcher is mostly developed to test & play around. Also to check if
+This graph stitcher is mostly developed to test & play around. Also to check if
 [evolutionary algorithms](https://en.wikipedia.org/wiki/Evolutionary_algorithm)
 can be developed to determine the best resulting graph.
 
@@ -114,3 +114,12 @@ dotted lines. Each graph is a candidate solution, the results of the
 validation are shown as titles of the graphs.
 
 ![output](./figure_1.png?raw=true "Output")
+
+To test the evolutionary algorithm run:
+
+    $ ./run_me.py -ea
+    
+Please note that it might not always find a set of good solutions, as the 
+container and the request are pretty small. Also note that currently the 
+fitness function expresses a fitness for the given conditions; and does not 
+include a fitness value for the validation phase.

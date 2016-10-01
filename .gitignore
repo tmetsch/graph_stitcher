@@ -1,3 +1,5 @@
-graph_gen.py
 **.pyc*
 *.idea/
+.coverage
+dist/
+graph_stitcher.egg-info/

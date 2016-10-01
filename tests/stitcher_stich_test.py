@@ -1,3 +1,6 @@
+"""
+Unittest for the basic stitcher.
+"""
 
 import json
 import unittest
@@ -31,12 +34,21 @@ class TestFilteringConditions(unittest.TestCase):
         self.cut = stitch.BaseStitcher()
 
     def test_filter_for_success(self):
+        """
+        Test filter for success.
+        """
         pass
 
     def test_filter_for_failure(self):
+        """
+        Test filter for failure.
+        """
         pass
 
     def test_filter_for_sanity(self):
+        """
+        Test filter for sanity.
+        """
         # none given as condition should results input = output
         inp = [1, 2, 3]
         out = stitch.my_filter(self.container, [1, 2, 3], None)
@@ -164,6 +176,9 @@ class TestFilteringConditions(unittest.TestCase):
                               res1[1].edges())
 
     def test_complex_filter_for_sanity(self):
+        """
+        Test filter for sanity with a more complex setup.
+        """
         container = nx.DiGraph()
         container.add_node('a', {'type': 'a', 'group': '1', 'geo': 'eu'})
         container.add_node('b', {'type': 'b', 'group': '1'})
@@ -210,15 +225,27 @@ class TestBaseStitcher(unittest.TestCase):
         self.cut = stitch.BaseStitcher()
 
     def test_stitch_for_success(self):
+        """
+        Test stitch for success.
+        """
         self.cut.stitch(self.container, self.request)
 
     def test_stitch_for_failure(self):
+        """
+        Test stitch for failure.
+        """
         pass
 
     def test_validate_for_failure(self):
+        """
+        Test validate for failure.
+        """
         self.assertRaises(NotImplementedError, self.cut.validate, [])
 
     def test_stitch_for_sanity(self):
+        """
+        Test stitch for sanity.
+        """
         # basic stitch test
         res1 = self.cut.stitch(self.container, self.request)
         self.assertTrue(len(res1) > 0)
@@ -255,13 +282,22 @@ class TestIncomingEdgeStitcher(unittest.TestCase):
         self.cut = stitch.IncomingEdgeStitcher()
 
     def test_validate_for_success(self):
+        """
+        Test validate for success.
+        """
         res1 = self.cut.stitch(self.container, self.request)
         self.cut.validate(res1)
 
     def test_validate_for_failure(self):
+        """
+        Test validate for failure.
+        """
         pass
 
     def test_validate_for_sanity(self):
+        """
+        Test validate for sanity.
+        """
         res1 = self.cut.stitch(self.container, self.request)
         res2 = self.cut.validate(res1, {'b': 5})
 
@@ -289,13 +325,22 @@ class TestNodeRankSticher(unittest.TestCase):
         self.cut = stitch.NodeRankStitcher()
 
     def test_validate_for_success(self):
+        """
+        Test validate for success.
+        """
         res1 = self.cut.stitch(self.container, self.request)
         self.cut.validate(res1)
 
     def test_validate_for_failure(self):
+        """
+        Test validate for failure.
+        """
         pass
 
     def test_validate_for_sanity(self):
+        """
+        Test validate for sanity.
+        """
         res1 = self.cut.stitch(self.container, self.request)
         res2 = self.cut.validate(res1, {'a': (0, 3)})
 

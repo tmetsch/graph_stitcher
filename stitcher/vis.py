@@ -93,6 +93,9 @@ def _plot_subplot(graph, new_nodes, prog, type_format, axes):
 
 
 def show_3d(graphs, request, results, prog='neato', save=False):
+    """
+    Show the candidates in 3d - the request elevated above the container.
+    """
     fig = plt.figure(figsize=(18, 10))
     fig.set_facecolor('white')
     i = 0
@@ -100,11 +103,11 @@ def show_3d(graphs, request, results, prog='neato', save=False):
     size = _get_size(len(graphs))
 
     for graph in graphs:
-        ax = fig.add_subplot(size[0], size[1], i+1, projection='3d')
-        ax.set_title(results[i])
-        ax._axis3don = False
+        axes = fig.add_subplot(size[0], size[1], i+1, projection='3d')
+        axes.set_title(results[i])
+        axes._axis3don = False
 
-        _plot_3d_subplot(graph, request, prog, ax)
+        _plot_3d_subplot(graph, request, prog, axes)
 
         i += 1
     fig.tight_layout()
@@ -114,7 +117,10 @@ def show_3d(graphs, request, results, prog='neato', save=False):
         plt.show()
 
 
-def _plot_3d_subplot(graph, request, prog, ax):
+def _plot_3d_subplot(graph, request, prog, axes):
+    """
+    Plot a single candidate graph in 3d.
+    """
     cache = {}
 
     tmp = graph.copy()
@@ -125,14 +131,14 @@ def _plot_3d_subplot(graph, request, prog, ax):
 
     # the container
     for item in tmp.nodes():
-        ax.plot([pos[item][0]], [pos[item][1]], [0], linestyle="None",
-                marker="o", color='gray')
-        ax.text(pos[item][0], pos[item][1], 0, item)
+        axes.plot([pos[item][0]], [pos[item][1]], [0], linestyle="None",
+                  marker="o", color='gray')
+        axes.text(pos[item][0], pos[item][1], 0, item)
 
     for src, trg in tmp.edges():
-        ax.plot([pos[src][0], pos[trg][0]],
-                [pos[src][1], pos[trg][1]],
-                [0, 0], color='gray')
+        axes.plot([pos[src][0], pos[trg][0]],
+                  [pos[src][1], pos[trg][1]],
+                  [0, 0], color='gray')
 
     # the new nodes
     for item in graph.nodes():
@@ -147,19 +153,19 @@ def _plot_3d_subplot(graph, request, prog, ax):
                     cache[item] = (x_val, y_val)
 
                     # edge
-                    ax.plot([x_val, pos[nghb][0]],
-                            [y_val, pos[nghb][1]],
-                            [SPACE, 0], color='blue')
+                    axes.plot([x_val, pos[nghb][0]],
+                              [y_val, pos[nghb][1]],
+                              [SPACE, 0], color='blue')
 
-            ax.plot([x_val], [y_val], [SPACE], linestyle="None", marker="o",
-                    color='blue')
-            ax.text(x_val, y_val, SPACE, item)
+            axes.plot([x_val], [y_val], [SPACE], linestyle="None", marker="o",
+                      color='blue')
+            axes.text(x_val, y_val, SPACE, item)
 
     for src, trg in request.edges():
         if trg in cache and src in cache:
-            ax.plot([cache[src][0], cache[trg][0]],
-                    [cache[src][1], cache[trg][1]],
-                    [SPACE, SPACE], color='blue')
+            axes.plot([cache[src][0], cache[trg][0]],
+                      [cache[src][1], cache[trg][1]],
+                      [SPACE, SPACE], color='blue')
 
 
 def _get_size(n_items):

@@ -71,7 +71,7 @@ def main(use_evol=False):
     results = stitcher.validate(graphs, {'b': 5})
 
     # XXX: disable this if you do not want to see the results.
-    vis.show(graphs, request.nodes(), results)
+    vis.show(graphs, request, results)
 
 
 if __name__ == '__main__':

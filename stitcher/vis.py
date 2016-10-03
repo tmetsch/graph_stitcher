@@ -16,8 +16,8 @@ SPACE = 25
 TYPE_FORMAT = {'a': '^', 'b': 's', 'c': 'v'}
 
 
-def show(graphs, new_nodes, results, prog='neato', size=None,
-         type_format=None):
+def show(graphs, request, titles, prog='neato', size=None,
+         type_format=None, save=False):
     """
     Display the results using matplotlib.
     """
@@ -38,11 +38,11 @@ def show(graphs, new_nodes, results, prog='neato', size=None,
         axarr[x_val, y_val].yaxis.set_major_formatter(plt.NullFormatter())
         axarr[x_val, y_val].xaxis.set_ticks([])
         axarr[x_val, y_val].yaxis.set_ticks([])
-        axarr[x_val, y_val].set_title(results[index])
+        axarr[x_val, y_val].set_title(titles[index])
         axarr[x_val, y_val].set_axis_bgcolor("white")
         if not type_format:
             type_format = TYPE_FORMAT
-        _plot_subplot(candidate, new_nodes, prog, type_format,
+        _plot_subplot(candidate, request.nodes(), prog, type_format,
                       axarr[x_val, y_val])
         y_val += 1
         if y_val > size[1] - 1:
@@ -50,7 +50,10 @@ def show(graphs, new_nodes, results, prog='neato', size=None,
             x_val += 1
         index += 1
     fig.tight_layout()
-    plt.show()
+    if save:
+        plt.savefig('foo' + str(time.time()) + '.png')
+    else:
+        plt.show()
 
 
 def _plot_subplot(graph, new_nodes, prog, type_format, axes):
@@ -92,7 +95,7 @@ def _plot_subplot(graph, new_nodes, prog, type_format, axes):
     nx.draw_networkx_labels(graph, pos, ax=axes)
 
 
-def show_3d(graphs, request, results, prog='neato', save=False):
+def show_3d(graphs, request, titles, prog='neato', save=False):
     """
     Show the candidates in 3d - the request elevated above the container.
     """
@@ -104,7 +107,7 @@ def show_3d(graphs, request, results, prog='neato', save=False):
 
     for graph in graphs:
         axes = fig.add_subplot(size[0], size[1], i+1, projection='3d')
-        axes.set_title(results[i])
+        axes.set_title(titles[i])
         axes._axis3don = False
 
         _plot_3d_subplot(graph, request, prog, axes)

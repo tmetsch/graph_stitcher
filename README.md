@@ -80,9 +80,9 @@ The basic filter support the following operations:
   * the notion that two nodes require the same or different target - example
     below: node 1 & 2 need to have the same stitched target node and node 3 & 4
     need to have different stitched target nodes.
-  * the notion that stitched target nodes share a common attribute - example
-    below: node x & y need to be stitched to target nodes which share the same
-    attribute value for the attribute with the name 'group'.
+  * the notion that stitched target nodes (not) share a common attribute - 
+    example below: node x & y need to be stitched to target nodes which share 
+    the same attribute value for the attribute with the name 'group'.
 
 The following dictionary can be passed in as a composition condition:
 
@@ -94,7 +94,8 @@ The following dictionary can be passed in as a composition condition:
                     ('regex', ('a', ('foo', '^a')))],
      'compositions': [('same', ('1', '2')),
                       ('diff', ('3', '4')),
-                      ('share', ('group', ['x', 'y']))]
+                      ('share', ('group', ['x', 'y'])),
+                      ('nshare', ('group', ['a', 'b']))]
     }
 
 This graph stitcher is mostly developed to test & play around. Also to check if

@@ -54,6 +54,7 @@ def show(graphs, request, titles, prog='neato', size=None,
         plt.savefig('foo' + str(time.time()) + '.png')
     else:
         plt.show()
+    plt.close()
 
 
 def _plot_subplot(graph, new_nodes, prog, type_format, axes):
@@ -118,6 +119,7 @@ def show_3d(graphs, request, titles, prog='neato', save=False):
         plt.savefig('foo' + str(time.time()) + '.png')
     else:
         plt.show()
+    plt.close()
 
 
 def _plot_3d_subplot(graph, request, prog, axes):

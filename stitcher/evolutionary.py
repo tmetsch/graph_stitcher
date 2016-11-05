@@ -102,7 +102,8 @@ def _diff_target(node1, node2, gens):
 def _share_attr(attrn, node_list, gens, container):
     """
     Calcs fitness based on the fact that two nodes from the request should be
-    stitched to two nodes in the container two share the same attribute
+    stitched to two nodes in the container which share the same attribute
+    value.
     """
     attrv = None
     for node in node_list:
@@ -112,6 +113,24 @@ def _share_attr(attrn, node_list, gens, container):
         elif attrv is None:
             attrv = container.node[trg][attrn]
         elif attrv != container.node[trg][attrn]:
+            return 10.2
+    return 0.0
+
+
+def _nshare_attr(attrn, node_list, gens, container):
+    """
+    Calcs fitness based on the fact that two nodes from the request should be
+    stitched to two nodes in the container which do not share the same
+    attribute value.
+    """
+    attrv = None
+    for node in node_list:
+        trg = gens[node]
+        if attrn not in container.node[trg]:
+            return 10.1
+        elif attrv is None:
+            attrv = container.node[trg][attrn]
+        elif attrv == container.node[trg][attrn]:
             return 10.2
     return 0.0
 
@@ -127,13 +146,13 @@ def _my_filter(conditions, gens, container):
             para2 = condition[1][1]
             if condition[0] == 'eq':
                 res += _eq_attr(para1, para2, gens, container)
-            if condition[0] == 'neq':
+            elif condition[0] == 'neq':
                 res += _neq_attr(para1, para2, gens, container)
-            if condition[0] == 'lg':
+            elif condition[0] == 'lg':
                 res += _lg_attr(para1, para2, gens, container)
-            if condition[0] == 'lt':
+            elif condition[0] == 'lt':
                 res += _lt_attr(para1, para2, gens, container)
-            if condition[0] == 'regex':
+            elif condition[0] == 'regex':
                 res += _regex_attr(para1, para2, gens, container)
     if 'compositions' in conditions:
         for condition in conditions['compositions']:
@@ -141,10 +160,12 @@ def _my_filter(conditions, gens, container):
             para2 = condition[1][1]
             if condition[0] == 'same':
                 res += _same_target(para1, para2, gens)
-            if condition[0] == 'diff':
+            elif condition[0] == 'diff':
                 res += _diff_target(para1, para2, gens)
-            if condition[0] == 'share':
+            elif condition[0] == 'share':
                 res += _share_attr(para1, para2, gens, container)
+            elif condition[0] == 'nshare':
+                res += _nshare_attr(para1, para2, gens, container)
     return res
 
 

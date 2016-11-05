@@ -218,6 +218,26 @@ class TestGraphCandidate(unittest.TestCase):
                                           self.container)
         self.assertEquals(cut.fitness(), 10.2)
 
+        # a and b are stitched to 1
+        condy = {'compositions': [('nshare', ('group', ['a', 'b']))]}
+        cut = evolutionary.GraphCandidate({'a': '1', 'b': '1'}, self.stitch,
+                                          condy, [], self.request,
+                                          self.container)
+        self.assertEquals(cut.fitness(), 10.2)
+
+        # node c has no group attr.
+        cut = evolutionary.GraphCandidate({'a': '1', 'b': '3'}, self.stitch,
+                                          condy, [], self.request,
+                                          self.container)
+        self.assertEquals(cut.fitness(), 10.1)
+
+        # c and d stitched to nodes with different group value.
+        condy = {'compositions': [('nshare', ('group', ['c', 'd']))]}
+        cut = evolutionary.GraphCandidate({'c': '4', 'd': '5'}, self.stitch,
+                                          condy, [], self.request,
+                                          self.container)
+        self.assertEquals(cut.fitness(), 0.0)
+
         # a and b stitched to same target.
         condy = {'compositions': [('same', ['a', 'b'])]}
         cut = evolutionary.GraphCandidate({'a': '1', 'b': '1'}, self.stitch,

@@ -175,13 +175,13 @@ class TestFilteringConditions(unittest.TestCase):
                                ('3', '4'), ('2', '3'), ('b', '3'), ('c', '4')],
                               res1[1].edges())
 
-    def test_complex_filter_for_sanity(self):
+    def test_attr_sharing_filter_for_sanity(self):
         """
         Test filter for sanity with a more complex setup.
         """
         container = nx.DiGraph()
         container.add_node('a', {'type': 'a', 'group': '1', 'geo': 'eu'})
-        container.add_node('b', {'type': 'b', 'group': '1'})
+        container.add_node('b', {'type': 'b', 'group': '1', 'geo': 'us'})
         container.add_node('c', {'type': 'a', 'group': '2'})
         container.add_node('d', {'type': 'b', 'group': '2'})
         container.add_node('e', {'type': 'b'})
@@ -199,7 +199,6 @@ class TestFilteringConditions(unittest.TestCase):
         condy = {'compositions': [('share', ('group', ['1', '2'])),
                                   ('same', ('2', '3'))],
                  'attributes': [('eq', ('1', ('geo', 'eu')))]}
-
         res1 = self.cut.stitch(container, request, conditions=condy)
 
         # only one option possible
@@ -208,6 +207,18 @@ class TestFilteringConditions(unittest.TestCase):
         self.assertIn(('1', 'a'), res1[0].edges())
         self.assertIn(('2', 'b'), res1[0].edges())
         self.assertIn(('3', 'b'), res1[0].edges())
+
+        condy = {'compositions': [('nshare', ('group', ['2', '3']))],
+                 'attributes': [('eq', ('1', ('geo', 'eu'))),
+                                ('eq', ('2', ('geo', 'us')))]}
+        res1 = self.cut.stitch(container, request, conditions=condy)
+
+        # only one option possible
+        self.assertEqual(len(res1), 1)
+        # verify stitches
+        self.assertIn(('1', 'a'), res1[0].edges())
+        self.assertIn(('2', 'b'), res1[0].edges())
+        self.assertIn(('3', 'd'), res1[0].edges())
 
 
 class TestBaseStitcher(unittest.TestCase):

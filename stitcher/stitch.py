@@ -46,13 +46,13 @@ def my_filter(container, edge_list, conditions):
                 para2 = condition[1][1]
                 if cond == 'eq':
                     _eq_attr_filter(container, para1, para2, edge_list)
-                if cond == 'neq':
+                elif cond == 'neq':
                     _neq_attr_filter(container, para1, para2, edge_list)
-                if cond == 'lg':
+                elif cond == 'lg':
                     _lg_attr_filter(container, para1, para2, edge_list)
-                if cond == 'lt':
+                elif cond == 'lt':
                     _lt_attr_filter(container, para1, para2, edge_list)
-                if cond == 'regex':
+                elif cond == 'regex':
                     _regex_attr_filter(container, para1, para2, edge_list)
         if 'compositions' in conditions:
             for condition in conditions['compositions']:
@@ -61,10 +61,12 @@ def my_filter(container, edge_list, conditions):
                 para2 = condition[1][1]
                 if cond == 'same':
                     _same_filter(para1, para2, edge_list)
-                if cond == 'diff':
+                elif cond == 'diff':
                     _diff_filter(para1, para2, edge_list)
-                if cond == 'share':
+                elif cond == 'share':
                     _share_attr(container, para1, para2, edge_list)
+                elif cond == 'nshare':
+                    _nshare_attr(container, para1, para2, edge_list)
         return edge_list
 
 
@@ -211,6 +213,25 @@ def _share_attr(container, attrn, nlist, candidate_list):
             elif src in nlist and attrv == '':
                 attrv = container.node[trg][attrn]
             elif src in nlist and container.node[trg][attrn] != attrv:
+                candidate_list.pop(candidate)
+                break
+
+
+def _nshare_attr(container, attrn, nlist, candidate_list):
+    """
+    Filter out candidates which do not adhere the request that all target nodes
+    stitched to in the nlist do not share the same attribute value for a given
+    attribute name.
+    """
+    for candidate in list(candidate_list.keys()):
+        attrv = ''
+        for src, trg in candidate_list[candidate]:
+            if attrn not in container.node[trg]:
+                candidate_list.pop(candidate)
+                break
+            elif src in nlist and attrv == '':
+                attrv = container.node[trg][attrn]
+            elif src in nlist and container.node[trg][attrn] == attrv:
                 candidate_list.pop(candidate)
                 break
 

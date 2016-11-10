@@ -42,7 +42,7 @@ def _lg_attr(node, attr, gens, container):
     trg_nd = container.node[gens[node]]
     if attr[0] not in trg_nd:
         return 10.1
-    elif attr[1] > trg_nd[attr[0]]:
+    elif attr[1] >= trg_nd[attr[0]]:
         return 10.2
     return 0.0
 

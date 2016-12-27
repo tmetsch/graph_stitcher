@@ -319,11 +319,6 @@ class BasicEvolution(object):
             i = random.randint(0, len(div_pool) - 1)
             new_population.append(div_pool[i])
 
-        # mutate some
-        for _ in range(int(self.mutate * len(new_population))):
-            i = random.randint(0, len(new_population) - 1)
-            new_population[i].mutate()
-
         # create children
         len_pop = len(population)
         len_new_pop = len(new_population)
@@ -331,7 +326,13 @@ class BasicEvolution(object):
             candidate1 = population[random.randint(0, len_new_pop - 1)]
             candidate2 = population[random.randint(0, len_new_pop - 1)]
             child = candidate1.crossover(candidate2)
+            # if child not in new_population:  # TODO: check if helpful.
             new_population.append(child)
+
+        # mutate some
+        for _ in range(int(self.mutate * (len_pop - len_new_pop))):
+            i = random.randint(len_new_pop, len_pop - 1)
+            new_population[i].mutate()
 
         LOG.debug('New population length: ' + str(len(new_population)))
         return new_population

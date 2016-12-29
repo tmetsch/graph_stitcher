@@ -102,8 +102,8 @@ class Entity(object):
                 # take it.
                 self.candidate.add_edge(node, self)  # TODO: edge attributes
                 self.candidate.remove_edge(node, other_entity)
-                other_entity.credits -= costs
-                self.credits += costs
+                other_entity.credits += costs
+                self.credits -= costs
         for node, bid in asks:
             pass
 

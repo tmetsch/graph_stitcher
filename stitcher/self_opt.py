@@ -111,7 +111,6 @@ class Entity(object):
         return self.node_name
 
     def __eq__(self, other):
-        print type(other)
         if isinstance(other, str):
             if other == self.node_name:
                 return True

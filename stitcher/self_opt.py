@@ -1,5 +1,5 @@
 """
-Module enable self optimization of nodes in the container.
+Module enabling self optimization of nodes in the container graph.
 """
 
 import logging

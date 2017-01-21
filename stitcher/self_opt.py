@@ -20,24 +20,25 @@ class Entity(object):
     associated wth the "fitness" of the stitch: for a real good fit the
     entities tries to bid high; for a bad fit it doesn't try hard. While using
     the credits the entity does not need to expose many details (e.g.
-    capacities) and can hide a bit of's capabilities towards it's neighbours.
+    capacities) and can hide a bit of it's capabilities towards it's neighbours.
 
     Assumption is that all nodes in the container know about the request nodes
     that need to stitched. In future we could think about entities even change
     edges which are not stitches between request and container.
     """
 
-    # TODO: how to simulate a trade - e.g. ask for one and give another back.
+    # TODO: how to simulate a trade - e.g. ask for one and give another back
+    #       (ask should include the id of asking node so it can propagate
+    #       through the network, so even not directly connected nodes known 
+    #       about the ask. Asks should age-out however). Check gossip papers.
 
     # TODO: how to prevent two entities are constantly bidding for two nodes
     #       which want to share target node?
 
-    # TODO: check bid for sth - and releasing sth else...to enable the bid to
-    #       come through.
-
     # TODO: check if we can somehow uplift those connections for which trades
     #       between two parties always were "good". And which make sense -
-    #       only offer sth to a neighbour if he theoretically could take it.
+    #       only offer sth to a neighbour if he theoretically could take it. 
+    #       Check ant-nets/"pheromone trails".
 
     def __init__(self, node_name, candidate, request, stitch, conditions):
         """
@@ -60,7 +61,7 @@ class Entity(object):
 
     def process(self):
         """
-        Process this entity.
+        Process this entity - find own optimal share based on fitness/utility.
         """
         offers = []  # nodes this entity doesn't want.
         asks = []  # nodes this entity wants.

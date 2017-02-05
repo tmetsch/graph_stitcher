@@ -33,7 +33,8 @@ class Entity(object):
     #       about the ask. Asks should age-out however). Check gossip papers.
 
     # TODO: how to prevent two entities are constantly bidding for two nodes
-    #       which want to share target node?
+    #       which want to share target node? How to ensure self-stablizing
+    #       attributes?
 
     # TODO: check if we can somehow uplift those connections for which trades
     #       between two parties always were "good". And which make sense -

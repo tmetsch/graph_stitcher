@@ -4,11 +4,11 @@ Implements stitching, validation and filtering functions.
 
 import copy
 import itertools
-import json
-import os
 import re
 
 import networkx as nx
+
+import stitcher
 
 
 def _find_nodes(graph, tzpe):
@@ -236,16 +236,10 @@ def _nshare_attr(container, attrn, nlist, candidate_list):
                 break
 
 
-class BaseStitcher(object):
+class GlobalStitcher(stitcher.Stitcher):
     """
-    Base stitcher with the function which need to be implemented.
+    Base stitcher with the functions which need to be implemented.
     """
-
-    def __init__(self, filename=None):
-        if filename is None:
-            filename = os.path.dirname(os.path.abspath(__file__)) + os.sep + \
-                       '..' + os.sep + 'data' + os.sep + 'stitch.json'
-        self.rels = json.load(open(filename, 'r'))
 
     def stitch(self, container, request, conditions=None,
                candidate_filter=my_filter):
@@ -303,73 +297,4 @@ class BaseStitcher(object):
             for src, trg in item:
                 candidate_graph.add_edge(src, trg)
             res.append(candidate_graph)
-        return res
-
-    def validate(self, graphs, param=None):
-        """
-        Validate a set of graphs from the stitch() function. Return a
-        dictionary with the index & explanatory text.
-
-        :param graphs: List of possible graphs
-        :param param: Parameters for this validator.
-        :return: dict with int:str.
-        """
-        # XXX: allow for chaining of validators & stitchers
-        raise NotImplementedError('Needs to be implemented...')
-
-
-class IncomingEdgeStitcher(BaseStitcher):
-    """
-    Implemented simple rule to validate based on # of incoming edges.
-    """
-
-    def validate(self, graphs, param=None):
-        """
-        In case a node of a certain type has more then a threshold of incoming
-        edges determine a possible stitches as a bad stitch.
-        """
-        param = param or {}
-        res = {}
-        i = 0
-        for candidate in graphs:
-            res[i] = 'ok'
-            for node, values in candidate.nodes(data=True):
-                if values['type'] not in param.keys():
-                    continue
-                else:
-                    tmp = param[values['type']]
-                if len(candidate.in_edges(node)) >= tmp:
-                    res[i] = 'node ' + str(node) + ' has to many edges: ' + \
-                             str(len(candidate.in_edges(node)))
-            i += 1
-        return res
-
-
-class NodeRankStitcher(BaseStitcher):
-    """
-    Implements simple rule to validate stitches based on ranks & incoming edges
-    of a node.
-    """
-
-    def validate(self, graphs, param=None):
-        """
-        In case a rank of a node and # of incoming edges increases determine
-        possible stitches as a bad stitch.
-        """
-        param = param or {}
-        res = {}
-        i = 0
-        for candidate in graphs:
-            res[i] = 'ok'
-            for node, values in candidate.nodes(data=True):
-                if values['type'] not in param.keys():
-                    continue
-                else:
-                    tmp = param[values['type']]
-                if len(candidate.in_edges(node)) > tmp[0] \
-                        and values['rank'] >= tmp[1]:
-                    res[i] = 'node ' + str(node) + ' rank is >= ' + \
-                             str(tmp[1]) + ' and # incoming edges is > ' \
-                             + str(tmp[0])
-            i += 1
         return res

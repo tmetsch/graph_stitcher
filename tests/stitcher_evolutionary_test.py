@@ -3,9 +3,12 @@ Unittest for the evolutionary module.
 """
 
 import itertools
+import json
 import logging
 import unittest
 import networkx as nx
+
+from networkx.readwrite import json_graph
 
 from stitcher import evolutionary
 
@@ -347,6 +350,41 @@ class TestBasicEvolution(unittest.TestCase):
         population = _get_population('b')
         iteration, _ = self.cut.run(population, 1)
         self.assertEquals(iteration, 0)  # done as we flip to b immediately.
+
+
+class EvolutionaryStitcherTest(unittest.TestCase):
+    """
+    Testcase for the evolutionary algorithm based stitcher.
+    """
+
+    def setUp(self):
+        container_tmp = json.load(open('data/container.json'))
+        self.container = json_graph.node_link_graph(container_tmp,
+                                                    directed=True)
+        request_tmp = json.load(open('data/request.json'))
+        self.request = json_graph.node_link_graph(request_tmp,
+                                                  directed=True)
+        self.cut = evolutionary.EvolutionarySticher()
+
+    def test_stitch_for_success(self):
+        """
+        test stitch for success.
+        """
+        self.cut.stitch(self.container, self.request)
+
+    def test_stitch_for_failure(self):
+        """
+        Test stitch for failure.
+        """
+        pass
+
+    def test_stitch_for_sanity(self):
+        """
+        Test stitch for sanity.
+        """
+        for _ in range(0, 25):
+            # changes are high that within one run the algo fins no solution.
+            self.cut.stitch(self.container, self.request)
 
 
 def _get_population(value):

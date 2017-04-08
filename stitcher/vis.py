@@ -5,7 +5,6 @@ Visualize possible stitches with the outcome of the validator.
 
 import math
 import random
-import time
 import matplotlib.pyplot as plt
 import networkx as nx
 import numpy as np
@@ -17,7 +16,7 @@ TYPE_FORMAT = {'a': '^', 'b': 's', 'c': 'v'}
 
 
 def show(graphs, request, titles, prog='neato', size=None,
-         type_format=None, save=False):
+         type_format=None, filename=None):
     """
     Display the results using matplotlib.
     """
@@ -50,8 +49,8 @@ def show(graphs, request, titles, prog='neato', size=None,
             x_val += 1
         index += 1
     fig.tight_layout()
-    if save:
-        plt.savefig('foo' + str(time.time()) + '.png')
+    if filename is not None:
+        plt.savefig(filename)
     else:
         plt.show()
     plt.close()
@@ -96,7 +95,7 @@ def _plot_subplot(graph, new_nodes, prog, type_format, axes):
     nx.draw_networkx_labels(graph, pos, ax=axes)
 
 
-def show_3d(graphs, request, titles, prog='neato', save=False):
+def show_3d(graphs, request, titles, prog='neato', filename=None):
     """
     Show the candidates in 3d - the request elevated above the container.
     """
@@ -115,8 +114,8 @@ def show_3d(graphs, request, titles, prog='neato', save=False):
 
         i += 1
     fig.tight_layout()
-    if save:
-        plt.savefig('foo' + str(time.time()) + '.png')
+    if filename is not None:
+        plt.savefig(filename)
     else:
         plt.show()
     plt.close()

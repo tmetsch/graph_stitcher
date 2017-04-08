@@ -1,11 +1,13 @@
 """
-Implements stitching, validation and filtering functions based on
-evolutionary algorithm.
+Implements stitching, and filtering functions based on evolutionary algorithm.
 """
 
 import logging
 import random
 import re
+import networkx as nx
+
+import stitcher
 
 LOG = logging.getLogger()
 
@@ -140,32 +142,33 @@ def _my_filter(conditions, gens, container):
     Apply filters.
     """
     res = 0.0
-    if 'attributes' in conditions:
-        for condition in conditions['attributes']:
-            para1 = condition[1][0]
-            para2 = condition[1][1]
-            if condition[0] == 'eq':
-                res += _eq_attr(para1, para2, gens, container)
-            elif condition[0] == 'neq':
-                res += _neq_attr(para1, para2, gens, container)
-            elif condition[0] == 'lg':
-                res += _lg_attr(para1, para2, gens, container)
-            elif condition[0] == 'lt':
-                res += _lt_attr(para1, para2, gens, container)
-            elif condition[0] == 'regex':
-                res += _regex_attr(para1, para2, gens, container)
-    if 'compositions' in conditions:
-        for condition in conditions['compositions']:
-            para1 = condition[1][0]
-            para2 = condition[1][1]
-            if condition[0] == 'same':
-                res += _same_target(para1, para2, gens)
-            elif condition[0] == 'diff':
-                res += _diff_target(para1, para2, gens)
-            elif condition[0] == 'share':
-                res += _share_attr(para1, para2, gens, container)
-            elif condition[0] == 'nshare':
-                res += _nshare_attr(para1, para2, gens, container)
+    if conditions is not None:
+        if 'attributes' in conditions:
+            for condition in conditions['attributes']:
+                para1 = condition[1][0]
+                para2 = condition[1][1]
+                if condition[0] == 'eq':
+                    res += _eq_attr(para1, para2, gens, container)
+                elif condition[0] == 'neq':
+                    res += _neq_attr(para1, para2, gens, container)
+                elif condition[0] == 'lg':
+                    res += _lg_attr(para1, para2, gens, container)
+                elif condition[0] == 'lt':
+                    res += _lt_attr(para1, para2, gens, container)
+                elif condition[0] == 'regex':
+                    res += _regex_attr(para1, para2, gens, container)
+        if 'compositions' in conditions:
+            for condition in conditions['compositions']:
+                para1 = condition[1][0]
+                para2 = condition[1][1]
+                if condition[0] == 'same':
+                    res += _same_target(para1, para2, gens)
+                elif condition[0] == 'diff':
+                    res += _diff_target(para1, para2, gens)
+                elif condition[0] == 'share':
+                    res += _share_attr(para1, para2, gens, container)
+                elif condition[0] == 'nshare':
+                    res += _nshare_attr(para1, para2, gens, container)
     return res
 
 
@@ -380,3 +383,61 @@ class BasicEvolution(object):
             LOG.warn('Maximum number of iterations reached')
         LOG.info('Final population: ' + repr(population))
         return iteration, population
+
+
+class EvolutionarySticher(stitcher.Stitcher):
+    """
+    Stitcher which uses an evolutionary algorithm.
+    """
+
+    def __init__(self, max_iter=10, fit_goal=1.0, cutoff=0.9, mutate=0.0,
+                 candidates=10):
+        """
+        Initializes this stitcher.
+
+        :param max_iter: Number of maximum iterations (default 10).
+        :param fit_goal: Fitness goal for the evolutionary algorithm (default
+            -1.0 : results in multiple solutions).
+        :param cutoff: Percentage of populate that survives (default 90%).
+        :param mutate: Percentage of population that mutates (default None).
+        :param candidates: Number of candidates to randomly generate
+            (default 10).
+        """
+        super(EvolutionarySticher, self).__init__()
+        self.max_iter = max_iter
+        self.fit_goal = fit_goal
+        self.cutoff = cutoff
+        self.mutate = mutate
+        self.candidates = candidates
+
+    def stitch(self, container, request, conditions=None):
+        evo = BasicEvolution(percent_cutoff=self.cutoff,
+                             percent_mutate=self.mutate)
+        conditions = {} or conditions
+
+        # initial population
+        population = []
+        for _ in range(self.candidates):
+            tmp = {}
+            for item in request.nodes():
+                trg_cand = random.choice(container.nodes())
+                tmp[item] = trg_cand
+            population.append(GraphCandidate(tmp, self.rels, conditions, [],
+                                             request, container))
+
+        _, population = evo.run(population,
+                                self.max_iter,
+                                fitness_goal=self.fit_goal)
+
+        if population[0].fitness() != 0.0:
+            logging.warn('Please rerun - did not find a viable solution')
+            return []
+
+        graphs = []
+        for candidate in population:
+            if candidate.fitness() == 0.0:
+                tmp_graph = nx.union(container, request)
+                for item in candidate.gen:
+                    tmp_graph.add_edge(item, candidate.gen[item])
+                graphs.append(tmp_graph)
+        return graphs

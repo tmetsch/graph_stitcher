@@ -31,7 +31,7 @@ class TestFilteringConditions(unittest.TestCase):
         self.request.add_node('b', {'type': 'y'})
         self.request.add_edge('a', 'b')
 
-        self.cut = stitch.BaseStitcher()
+        self.cut = stitch.GlobalStitcher()
 
     def test_filter_for_success(self):
         """
@@ -221,9 +221,9 @@ class TestFilteringConditions(unittest.TestCase):
         self.assertIn(('3', 'd'), res1[0].edges())
 
 
-class TestBaseStitcher(unittest.TestCase):
+class TestGlobalStitcher(unittest.TestCase):
     """
-    Test the base stitcher class.
+    Test the global stitcher class.
     """
 
     def setUp(self):
@@ -233,7 +233,7 @@ class TestBaseStitcher(unittest.TestCase):
         request_tmp = json.load(open('data/request.json'))
         self.request = json_graph.node_link_graph(request_tmp,
                                                   directed=True)
-        self.cut = stitch.BaseStitcher()
+        self.cut = stitch.GlobalStitcher()
 
     def test_stitch_for_success(self):
         """
@@ -246,12 +246,6 @@ class TestBaseStitcher(unittest.TestCase):
         Test stitch for failure.
         """
         pass
-
-    def test_validate_for_failure(self):
-        """
-        Test validate for failure.
-        """
-        self.assertRaises(NotImplementedError, self.cut.validate, [])
 
     def test_stitch_for_sanity(self):
         """
@@ -276,85 +270,3 @@ class TestBaseStitcher(unittest.TestCase):
                          self.container.number_of_edges() + 5)
         self.assertEqual(res1[0].number_of_nodes(),
                          self.container.number_of_nodes() + 3)
-
-
-class TestIncomingEdgeStitcher(unittest.TestCase):
-    """
-    Test the simple stitcher class based on # of incoming edges.
-    """
-
-    def setUp(self):
-        container_tmp = json.load(open('data/container.json'))
-        self.container = json_graph.node_link_graph(container_tmp,
-                                                    directed=True)
-        request_tmp = json.load(open('data/request.json'))
-        self.request = json_graph.node_link_graph(request_tmp,
-                                                  directed=True)
-        self.cut = stitch.IncomingEdgeStitcher()
-
-    def test_validate_for_success(self):
-        """
-        Test validate for success.
-        """
-        res1 = self.cut.stitch(self.container, self.request)
-        self.cut.validate(res1)
-
-    def test_validate_for_failure(self):
-        """
-        Test validate for failure.
-        """
-        pass
-
-    def test_validate_for_sanity(self):
-        """
-        Test validate for sanity.
-        """
-        res1 = self.cut.stitch(self.container, self.request)
-        res2 = self.cut.validate(res1, {'b': 5})
-
-        self.assertTrue(len(res2) == 8)
-        # 4 are ok & 4 are stupid
-        count = 0
-        for item in res2:
-            if res2[item] != 'ok':
-                count += 1
-        self.assertEqual(count, 4)
-
-
-class TestNodeRankSticher(unittest.TestCase):
-    """
-    Test the simple stitcher class based on ranks.
-    """
-
-    def setUp(self):
-        container_tmp = json.load(open('data/container.json'))
-        self.container = json_graph.node_link_graph(container_tmp,
-                                                    directed=True)
-        request_tmp = json.load(open('data/request.json'))
-        self.request = json_graph.node_link_graph(request_tmp,
-                                                  directed=True)
-        self.cut = stitch.NodeRankStitcher()
-
-    def test_validate_for_success(self):
-        """
-        Test validate for success.
-        """
-        res1 = self.cut.stitch(self.container, self.request)
-        self.cut.validate(res1)
-
-    def test_validate_for_failure(self):
-        """
-        Test validate for failure.
-        """
-        pass
-
-    def test_validate_for_sanity(self):
-        """
-        Test validate for sanity.
-        """
-        res1 = self.cut.stitch(self.container, self.request)
-        res2 = self.cut.validate(res1, {'a': (0, 3)})
-
-        self.assertTrue(len(res2) == 8)
-        self.assertEquals(res2[4],
-                          'node B rank is >= 3 and # incoming edges is > 0')

@@ -60,97 +60,96 @@ class EntityTest(unittest.TestCase):
         Test trigger for failure.
         """
         # test calculation of credits to bid.
+        # no conditions
+        cut = so.Entity('x', self.map, self.request, self.container)
+        self.container.add_node(cut, self.x_attr)
+        res, bids = cut.trigger({'assigned': {}, 'bids': {}}, 'init')
+        self.assertEqual(res['a'][1], 1.0)  # 1 because type matches.
+        self.assertNotIn('b', bids)  # a should not bid on b.
 
         # lg
         condy = {'attributes': [('lg', ('a', ('foo', 1)))]}
         cut = so.Entity('x', self.map, self.request, self.container, condy)
         self.container.add_node(cut, self.x_attr)
         res, bids = cut.trigger({'assigned': {}, 'bids': []}, 'init')
-        self.assertIs(res['a'][1], 2)  # 3-1=2
-        self.assertNotIn('b', bids)  # a should not bid on b.
+        self.assertEqual(res['a'][1], 3.0)  # rank 3 - rank 1 + 1 for type = 2
 
         # lt
         condy = {'attributes': [('lt', ('a', ('foo', 9)))]}
-        cut, _ = so.Entity('x', self.map, self.request, self.container, condy)
+        cut = so.Entity('x', self.map, self.request, self.container, condy)
         self.container.add_node(cut, self.x_attr)
-        res = cut.trigger({'assigned': {}, 'bids': []}, 'init')
-        self.assertIs(res['a'][1], 6)  # 9-3=6
+        res, bids = cut.trigger({'assigned': {}, 'bids': []}, 'init')
+        self.assertEqual(res['a'][1], 7.0)  # 9-3+1=7
 
         # eq
         condy = {'attributes': [('eq', ('a', ('foo', 2)))]}
         cut = so.Entity('x', self.map, self.request, self.container, condy)
         self.container.add_node(cut, self.x_attr)
         res, _ = cut.trigger({'assigned': {}, 'bids': []}, 'init')
-        self.assertIs(res['a'][1], 1)
+        self.assertNotIn('a', bids)  # popped because not equal.
 
         # neq
-        condy = {'attributes': [('neq', ('a', ('group_1', 'x')))]}
+        condy = {'attributes': [('neq', ('a', ('group_1', 'a')))]}
         cut = so.Entity('x', self.map, self.request, self.container, condy)
         self.container.add_node(cut, self.x_attr)
         res, _ = cut.trigger({'assigned': {}, 'bids': []}, 'init')
-        self.assertIs(res['a'][1], 1)
+        self.assertNotIn('a', bids)  # popped because equal.
 
         # regex
-        condy = {'attributes': [('regex', ('a', ('group_1', '^a')))]}
+        condy = {'attributes': [('regex', ('a', ('group_1', '^z')))]}
         cut = so.Entity('x', self.map, self.request, self.container, condy)
         self.container.add_node(cut, self.x_attr)
         res, _ = cut.trigger({'assigned': {}, 'bids': []}, 'init')
-        self.assertIs(res['a'][1], 1)
+        self.assertNotIn('a', bids)  # popped because z not in group name.
 
         # same
         # 1. nothing assigned -> increase bit for both (50%)
-        condy = {'compositions': [('same', ('a', 'b'))]}
-        cut = so.Entity('x', self.map, self.request, self.container, condy)
-        self.container.add_node(cut, self.x_attr)
+        condy = {'compositions': [('same', ['b', 'c'])]}
+        cut = so.Entity('y', self.map, self.request, self.container, condy)
+        self.container.add_node(cut, self.y_attr)
         res, bids = cut.trigger({'assigned': {}, 'bids': []}, 'init')
-        self.assertIs(res['a'][1], 1.5)  # 1 + 0.5 increase
-        self.assertIs(res['b'][1], 1.5)  # 1 + 0.5 increase
+        self.assertEqual(res['b'][1], 1.5)  # 1 + 0.5 increase
+        self.assertEqual(res['c'][1], 1.5)  # 1 + 0.5 increase
 
         # 2. a,b, assigned to sth else -> nothing
-        condy = {'compositions': [('same', ('a', 'b'))]}
-        cut = so.Entity('x', self.map, self.request, self.container, condy)
-        self.container.add_node(cut, self.x_attr)
-        res, bids = cut.trigger({'assigned': {'a': ('k', 10), 'b': ('l', 10)},
-                                 'bids': []}, 'init')
         # so e.g. only better attribute matches can increase the need for it
         # to bid higher - and eventually stuff getting assigned here.
-        self.assertNotIn('a', bids)
-        self.assertNotIn('b', bids)
 
         # diff
         # 1. nothing assigned -> drop one bid
-        condy = {'compositions': [('nhare', ('group_1', ['a', 'b']))]}
-        cut = so.Entity('x', self.map, self.request, self.container, condy)
-        self.container.add_node(cut, self.x_attr)
+        condy = {'compositions': [('diff', ['b', 'c'])]}
+        cut = so.Entity('y', self.map, self.request, self.container, condy)
+        self.container.add_node(cut, self.y_attr)
         res, bids = cut.trigger({'assigned': {}, 'bids': []}, 'init')
-        self.assertIs(res['a'][1], 1)  # 1 (type)
-        self.assertNotIn('b', bids)  # drop other bid.
+        self.assertEqual(res['c'][1], 1.0)  # 1 (type)
+        self.assertNotIn('b', bids['y'])  # drop other bid.
 
         # 2. a assigned, b no bid -> increase bid for b (50%)
-        condy = {'compositions': [('share', ('group_1', ['a', 'b']))]}
+        condy = {'compositions': [('diff', ['a', 'c'])]}
         cut_x = so.Entity('x', self.map, self.request, self.container, condy)
         cut_y = so.Entity('y', self.map, self.request, self.container, condy)
         self.container.add_node(cut_x, self.x_attr)
         self.container.add_node(cut_y, self.y_attr)
         self.container.add_edge(cut_x, cut_y)
-        self.container.add_node(cut, self.x_attr)
-        res, bids = cut_x.trigger({'assigned': {'y': ('a', 1)},
+        res, bids = cut_x.trigger({'assigned': {},
                                    'bids': []}, 'init')
-        self.assertIs(res['b'][1], 1.5)  # 1 (type) + 0.5 increase
+        self.assertEqual(res['a'][0], 'x')
+        self.assertEqual(res['c'][0], 'y')
+        self.assertEqual(res['c'][1], 1.5)  # 1 (type) + 0.5 increase
 
         # 3. a,b, assigned to sth else -> if neighbour bids too -
         # increase bid a bit (25%)
-        condy = {'compositions': [('share', ('group_1', ['a', 'b']))]}
+        condy = {'compositions': [('diff', ['a', 'c'])]}
         cut_x = so.Entity('x', self.map, self.request, self.container, condy)
         cut_y = so.Entity('y', self.map, self.request, self.container, condy)
         self.container.add_node(cut_x, self.x_attr)
         self.container.add_node(cut_y, self.y_attr)
         self.container.add_edge(cut_x, cut_y)
-        res, bids = cut_x.trigger({'assigned': {'a': ('k', 10),
-                                                'b': ('l', 10)},
+        res, bids = cut_x.trigger({'assigned': {'a': ('k', 10.0),
+                                                'c': ('l', 10.0)},
                                    'bids': []}, 'init')
-        self.assertIs(bids['b'][1], 1)  # y should bid on b
-        self.assertIs(bids['a'][1], 1.25)  # x bid should increase by 0.25
+        self.assertEqual(bids['x']['a'], 1.25)  # y bid on a + 0.25
+        self.assertEqual(bids['y']['c'], 1.25)  # y bid on b + 0.25
 
         # share
         # 1. nothing assigned -> increase bit for both (50%)
@@ -158,19 +157,13 @@ class EntityTest(unittest.TestCase):
         cut = so.Entity('x', self.map, self.request, self.container, condy)
         self.container.add_node(cut, self.x_attr)
         res, bids = cut.trigger({'assigned': {}, 'bids': []}, 'init')
-        self.assertIs(res['a'][1], 1.5)  # 1 + 0.5 increase
-        self.assertIs(res['b'][1], 1.5)  # 1 + 0.5 increase
+        self.assertEqual(res['a'][1], 1.5)  # 1 + 0.5 increase
+        self.assertEqual(res['b'][1], 1.5)  # 1 + 0.5 increase
+        self.assertTrue(False)
 
         # 2. a, b assigned somewhere else, ->  nothing
-        condy = {'compositions': [('share', ('group_1', ['a', 'b']))]}
-        cut = so.Entity('x', self.map, self.request, self.container, condy)
-        self.container.add_node(cut, self.x_attr)
-        res, bids = cut.trigger({'assigned': {'a': ('k', 10), 'b': ('l', 10)},
-                                 'bids': []}, 'init')
         # so e.g. only better attribute matches can increase the need for it
         # to bid higher - and eventually stuff getting assigned here.
-        self.assertNotIn('a', bids)
-        self.assertNotIn('b', bids)
 
         # nshare
         # 1. nothing assigned -> drop one bid
@@ -178,7 +171,7 @@ class EntityTest(unittest.TestCase):
         cut = so.Entity('x', self.map, self.request, self.container, condy)
         self.container.add_node(cut, self.x_attr)
         res, bids = cut.trigger({'assigned': {}, 'bids': []}, 'init')
-        self.assertIs(res['a'][1], 1)  # 1 (type)
+        self.assertEqual(res['a'][1], 1.0)  # 1 (type)
         self.assertNotIn('b', bids)  # drop other bid.
 
         # 2. a assigned, b no bid -> increase bid for b (50%)
@@ -191,7 +184,7 @@ class EntityTest(unittest.TestCase):
         self.container.add_node(cut, self.x_attr)
         res, bids = cut_x.trigger({'assigned': {'y': ('a', 1)},
                                    'bids': []}, 'init')
-        self.assertIs(res['b'][1], 1.5)  # 1 (type) + 0.5 increase
+        self.assertEqual(res['b'][1], 1.5)  # 1 (type) + 0.5 increase
 
         # 3. a,b, assigned to sth else -> if neighbour bids too -
         # increase bid a bit (25%)
@@ -201,11 +194,11 @@ class EntityTest(unittest.TestCase):
         self.container.add_node(cut_x, self.x_attr)
         self.container.add_node(cut_y, self.y_attr)
         self.container.add_edge(cut_x, cut_y)
-        res, bids = cut_x.trigger({'assigned': {'a': ('k', 10),
-                                                'b': ('l', 10)},
+        res, bids = cut_x.trigger({'assigned': {'a': ('k', 10.0),
+                                                'b': ('l', 10.0)},
                                    'bids': []}, 'init')
-        self.assertIs(bids['b'][1], 1)  # y should bit on b
-        self.assertIs(bids['a'][1], 1.25)  # x bid should increse by 0.25
+        self.assertEqual(bids['b'][1], 1.0)  # y should bit on b
+        self.assertEqual(bids['a'][1], 1.25)  # x bid should increse by 0.25
 
 
 class SelfOptStitcherTest(unittest.TestCase):

@@ -3,16 +3,106 @@ Implements stitching, and filtering functions based on a bidding concept.
 """
 
 import logging
+import re
+
 import networkx as nx
 
 import stitcher
 
 TMP = {}
 
+FACTOR_1 = 1.25
+FACTOR_2 = 1.5
+
+
+def _attribute_condy(condy, bids, param, node_attr):
+    """
+    Basic rules to deal with attribute conditions.
+    """
+    node = param[0]
+    attrn = param[1][0]
+    attrv = param[1][1]
+    if condy == 'lg':
+        # huge delta -> high bid.
+        bids[node] = node_attr[attrn] - attrv + bids[node]
+    elif condy == 'lt':
+        # huge delta -> high bid.
+        bids[node] = attrv - node_attr[attrn] + bids[node]
+    elif condy == 'eq':
+        # attr not present or not equal -> drop bid.
+        if attrn not in node_attr or attrv != node_attr[attrn]:
+            bids.pop(node)
+    elif condy == 'neq':
+        # attr present and equal -> drop bid.
+        if attrn in node_attr and attrv == node_attr[attrn]:
+            bids.pop(node)
+    elif condy == 'regex':
+        # attr present and reges does not match -> drop bid.
+        if attrn in node_attr and not re.search(attrv, node_attr[attrn]):
+            bids.pop(node)
+
+
+def _same_condy(bids, param):
+    flag = True
+    # if I do a bid on all elements in param...
+    for item in param:
+        if item not in bids.keys():
+            flag = False
+            break
+    # ... I'll increase the bids.
+    if flag:
+        for item in param:
+            bids[item] = bids[item] * FACTOR_2
+
+
+def _diff_condy(bids, assigned, param):
+    # if other entity has the others - I can increase my bid for the greater
+    # good.
+    for item in param:
+        if item not in assigned and len(assigned) != 0:
+            bids[item] = bids[item] * FACTOR_2
+        elif item in bids and item in assigned and len(assigned) != 0:
+            bids[item] = bids[item] * FACTOR_1
+
+    # keep highest bid - remove rest.
+    keeper = max(bids, key=lambda k: bids[k] if k in param else None)
+    for item in param:
+        if item in bids and item != keeper:
+            bids.pop(item)
+
+
+def _share_condy(bids, param, container):
+    attrn = param[0]
+    nodes = param[1]
+    # TODO: here I am
+
+
+def _apply_conditions(bids, assigned, node, conditions, container):
+    """
+    Alter bids based on conditions.
+    """
+    if 'attributes' in conditions:
+        for item in conditions['attributes']:
+            condy = item[0]
+            param = item[1]
+            node_attr = container.node[node]
+            _attribute_condy(condy, bids, param, node_attr)
+    if 'compositions' in conditions:
+        for item in conditions['compositions']:
+            condy = item[0]
+            param = item[1]
+            if condy == 'same':
+                _same_condy(bids, param)
+            elif condy == 'diff':
+                _diff_condy(bids, assigned, param)
+            elif condy == 'share':
+                _share_condy(bids, param, container)
+    return bids
+
 
 class Entity(object):
     """
-    An node in a graph that can bid on nodes of the request graph.
+    A node in a graph that can bid on nodes of the request graph.
     """
 
     def __init__(self, name, mapping, request, container, conditions=None):
@@ -23,30 +113,20 @@ class Entity(object):
         self.bids = {}
         self.conditions = conditions or {}
 
-    def _calc_credits(self):
-        tmp = []
+    def _calc_credits(self, assigned):
+        tmp = {}
         for node, attr in self.request.nodes(data=True):
             if self.mapping[attr['type']] == self.container.node[self]['type']:
-                # TODO - ensure no bids are added which are already done and
-                # cannot be exceeded.
-                # TODO: bidding concept:
-                # - lg, gt, eq, neq, regex: bid if met - higher bit the bigger
-                #   delta.
-                # - same & diff: increase bid if other is near or away.
-                # - share, nshare: (increase) bid if other entity with same
-                #   attr fits/doesn't fit.
-                if self.name == 'A':
-                    tmp.append((node, 8))
-                elif self.name == 'B':
-                    tmp.append((node, 9))
-                else:
-                    tmp.append((node, 10))
-                # calculating credits.
+                tmp[node] = 1.0
             else:
                 pass
         if len(tmp) > 0:
-            self.bids[self.name] = tmp
-        logging.info(self.name + ' - current bids ' + repr(self.bids))
+            self.bids[self.name] = _apply_conditions(tmp,
+                                                     assigned,
+                                                     self,
+                                                     self.conditions,
+                                                     self.container)
+        logging.info(self.name + ': current bids ' + repr(self.bids))
 
     def trigger(self, msg, src):
         """
@@ -55,8 +135,9 @@ class Entity(object):
         :param msg: dict containing the message from other entity.
         :param src: str indicating the src of where the message comes from.
         """
-        self._calc_credits()
         logging.info(str(src) + ' -> ' + str(self.name) + ' msg: ' + str(msg))
+        assigned = msg['assigned']
+        self._calc_credits(assigned)
 
         # let's add those I didn't know of
         mod = msg['bids'] == self.bids
@@ -66,11 +147,10 @@ class Entity(object):
                 self.bids[item] = msg['bids'][item]
 
         # assign and optimize were needed.
-        assigned = msg['assigned']
         if self.name in self.bids:
             for bid in self.bids[self.name]:
-                rq_n = bid[0]  # request node
-                crd = bid[1]  # bid 'credits'.
+                rq_n = bid  # request node
+                crd = self.bids[self.name][bid]  # bid 'credits'.
                 if rq_n not in assigned:
                     logging.info('Assigning: ' + rq_n + ' -> ' + self.name)
                     assigned[rq_n] = (self.name, crd)

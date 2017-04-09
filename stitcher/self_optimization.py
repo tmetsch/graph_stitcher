@@ -65,6 +65,7 @@ def _same_condy(my_bids, param):
             flag = False
             break
     # ... I'll increase the bids.
+    # TODO: only if my bid is better though...
     if flag:
         for item in param:
             my_bids[item] = my_bids[item] * FACTOR_2
@@ -98,6 +99,8 @@ def _diff_condy(my_bids, assigned, all_bids, param):
 
 
 def _share_condy(my_bids, assigned, param, node, container):
+    # TODO: this is sub optimal - should only bid higher if the set of
+    # stitches I would do instead of the existing one is better.
     attrn = param[0]
     attrv_assigned = None
     nodes = param[1]

@@ -12,6 +12,7 @@ import logging
 from networkx.readwrite import json_graph
 
 from stitcher import evolutionary
+from stitcher import self_optimization as so
 from stitcher import stitch
 from stitcher import validators
 from stitcher import vis
@@ -33,10 +34,12 @@ def main(algo):
 
     if algo == 'evolutionary':
         # to show the true power of this :-)
-        conditions = {'compositions': {('diff', ('k', 'l'))}}
+        conditions = {'compositions': [('diff', ('k', 'l'))]}
         stitcher = evolutionary.EvolutionarySticher()
     elif algo == 'self_opt':
-        stitcher = None
+        # to show the true power of this :-)
+        conditions = {'attributes': [('lt', ('l', ('rank', 9)))]}
+        stitcher = so.SelfOptStitcher()
     else:
         stitcher = stitch.GlobalStitcher()
     graphs = stitcher.stitch(container, request, conditions=conditions)

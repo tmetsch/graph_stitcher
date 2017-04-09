@@ -15,69 +15,115 @@ FACTOR_1 = 1.25
 FACTOR_2 = 1.5
 
 
-def _attribute_condy(condy, bids, param, node_attr):
+def _other_bids(all_bids):
+    """
+    XXX: see if this can be simplified. Maybe by using diff struct in bids.
+    """
+    res = []
+    for item in all_bids.values():
+        for sub_item in item:
+            res.append(sub_item)
+    return res
+
+
+def _attribute_condy(condy, my_bids, param, node_attr):
     """
     Basic rules to deal with attribute conditions.
     """
     node = param[0]
     attrn = param[1][0]
     attrv = param[1][1]
+    if node not in my_bids:
+        # I'm not bidding on this node - so no need to do sth.
+        return
+
     if condy == 'lg':
         # huge delta -> high bid.
-        bids[node] = node_attr[attrn] - attrv + bids[node]
+        my_bids[node] = node_attr[attrn] - attrv + my_bids[node]
     elif condy == 'lt':
         # huge delta -> high bid.
-        bids[node] = attrv - node_attr[attrn] + bids[node]
+        my_bids[node] = attrv - node_attr[attrn] + my_bids[node]
     elif condy == 'eq':
         # attr not present or not equal -> drop bid.
         if attrn not in node_attr or attrv != node_attr[attrn]:
-            bids.pop(node)
+            my_bids.pop(node)
     elif condy == 'neq':
         # attr present and equal -> drop bid.
         if attrn in node_attr and attrv == node_attr[attrn]:
-            bids.pop(node)
+            my_bids.pop(node)
     elif condy == 'regex':
         # attr present and reges does not match -> drop bid.
         if attrn in node_attr and not re.search(attrv, node_attr[attrn]):
-            bids.pop(node)
+            my_bids.pop(node)
 
 
-def _same_condy(bids, param):
+def _same_condy(my_bids, param):
     flag = True
     # if I do a bid on all elements in param...
     for item in param:
-        if item not in bids.keys():
+        if item not in my_bids.keys():
             flag = False
             break
     # ... I'll increase the bids.
     if flag:
         for item in param:
-            bids[item] = bids[item] * FACTOR_2
+            my_bids[item] = my_bids[item] * FACTOR_2
+    else:
+        for item in param:
+            # if not all can be stitched to me - I need to remove all bids.
+            if item in my_bids:
+                my_bids.pop(item)
 
 
-def _diff_condy(bids, assigned, param):
+def _diff_condy(my_bids, assigned, all_bids, param):
     # if other entity has the others - I can increase my bid for the greater
     # good.
     for item in param:
-        if item not in assigned and len(assigned) != 0:
-            bids[item] = bids[item] * FACTOR_2
-        elif item in bids and item in assigned and len(assigned) != 0:
-            bids[item] = bids[item] * FACTOR_1
+        if set(param) - set(assigned.keys()) == {item}:
+            # if others assigned increase by factor 2
+            my_bids[item] = my_bids[item] * FACTOR_2
+        elif set(param) - set(_other_bids(all_bids)) == {item}:
+            # if others are bid on increase by factor 1
+            my_bids[item] = my_bids[item] * FACTOR_1
+        elif len(set(param) - set(_other_bids(all_bids))) == 0 \
+                and item in my_bids:
+            # bids out for all - increase by factor 1
+            my_bids[item] = my_bids[item] * FACTOR_1
 
     # keep highest bid - remove rest.
-    keeper = max(bids, key=lambda k: bids[k] if k in param else None)
+    keeper = max(my_bids, key=lambda k: my_bids[k] if k in param else None)
     for item in param:
-        if item in bids and item != keeper:
-            bids.pop(item)
+        if item in my_bids and item != keeper:
+            my_bids.pop(item)
 
 
-def _share_condy(bids, param, container):
+def _share_condy(my_bids, assigned, param, node, container):
     attrn = param[0]
+    attrv_assigned = None
     nodes = param[1]
-    # TODO: here I am
+    for item in nodes:
+        if item in assigned and attrv_assigned is None:
+            tmp = [n for n in container.nodes() if n.name == assigned[item][0]]
+            attrv_assigned = container.node[tmp[0]][attrn]
+        elif attrv_assigned is not None and item in my_bids \
+                and container.node[node][attrn] == attrv_assigned:
+            my_bids[item] = my_bids[item] * FACTOR_2
 
 
-def _apply_conditions(bids, assigned, node, conditions, container):
+def _nshare_condy(my_bids, assigned, param, node, container):
+    attrn = param[0]
+    attrv_assigned = None
+    nodes = param[1]
+    for item in nodes:
+        if item in assigned and attrv_assigned is None:
+            tmp = [n for n in container.nodes() if n.name == assigned[item][0]]
+            attrv_assigned = container.node[tmp[0]][attrn]
+        elif attrv_assigned is not None and item in my_bids \
+                and container.node[node][attrn] != attrv_assigned:
+            my_bids[item] = my_bids[item] * FACTOR_2
+
+
+def _apply_conditions(my_bids, assigned, node, conditions, container):
     """
     Alter bids based on conditions.
     """
@@ -86,18 +132,20 @@ def _apply_conditions(bids, assigned, node, conditions, container):
             condy = item[0]
             param = item[1]
             node_attr = container.node[node]
-            _attribute_condy(condy, bids, param, node_attr)
+            _attribute_condy(condy, my_bids, param, node_attr)
     if 'compositions' in conditions:
         for item in conditions['compositions']:
             condy = item[0]
             param = item[1]
             if condy == 'same':
-                _same_condy(bids, param)
+                _same_condy(my_bids, param)
             elif condy == 'diff':
-                _diff_condy(bids, assigned, param)
+                _diff_condy(my_bids, assigned, node.bids, param)
             elif condy == 'share':
-                _share_condy(bids, param, container)
-    return bids
+                _share_condy(my_bids, assigned, param, node, container)
+            elif condy == 'nshare':
+                _nshare_condy(my_bids, assigned, param, node, container)
+    return my_bids
 
 
 class Entity(object):
@@ -118,8 +166,6 @@ class Entity(object):
         for node, attr in self.request.nodes(data=True):
             if self.mapping[attr['type']] == self.container.node[self]['type']:
                 tmp[node] = 1.0
-            else:
-                pass
         if len(tmp) > 0:
             self.bids[self.name] = _apply_conditions(tmp,
                                                      assigned,
@@ -136,8 +182,6 @@ class Entity(object):
         :param src: str indicating the src of where the message comes from.
         """
         logging.info(str(src) + ' -> ' + str(self.name) + ' msg: ' + str(msg))
-        assigned = msg['assigned']
-        self._calc_credits(assigned)
 
         # let's add those I didn't know of
         mod = msg['bids'] == self.bids
@@ -146,6 +190,8 @@ class Entity(object):
                 # Only pick bids from other - each entity controls own bids!
                 self.bids[item] = msg['bids'][item]
 
+        assigned = msg['assigned']
+        self._calc_credits(assigned)
         # assign and optimize were needed.
         if self.name in self.bids:
             for bid in self.bids[self.name]:
@@ -184,10 +230,12 @@ class SelfOptStitcher(stitcher.Stitcher):
     """
 
     def stitch(self, container, request, conditions=None, start=None):
+        condy = conditions or {}
         opt_graph = nx.DiGraph()
         tmp = {}
         for node, attr in container.nodes(data=True):
-            tmp[node] = Entity(node, self.rels, request, opt_graph)
+            tmp[node] = Entity(node, self.rels, request, opt_graph,
+                               conditions=condy)
             opt_graph.add_node(tmp[node], attr)
         for src, trg, attr in container.edges(data=True):
             opt_graph.add_edge(tmp[src], tmp[trg], attr)

@@ -2,7 +2,6 @@
 Unittest for the self_optimization module.
 """
 
-
 import logging
 import unittest
 
@@ -179,32 +178,10 @@ class EntityTest(unittest.TestCase):
         self.container.add_node(cut_y, self.y_attr)
         self.container.add_edge(cut_x, cut_y)
         res, bids = cut_x.trigger({'assigned': {}, 'bids': []}, 'init')
-        self.assertEqual(res['b'][1], 1.5)  # 1 + 0.5 increase
+        self.assertEqual(res['b'][1], 1.5)  # +50% b/c group complete.
         self.assertEqual(res['b'][0], 'y')  # b should be stitched to y
-        self.assertEqual(res['a'][1], 1.0)  # a sits fine on x
+        self.assertEqual(res['a'][1], 1.5)  # +50% b/c group complete.
         self.assertEqual(res['a'][0], 'x')  # a should be stitched to x
-
-        # a,b assigned somewhere else. if there is a bid for a from x and I (y)
-        # share attr with x increase bid (25%).
-        # TODO: implement this.
-        # self.container = nx.DiGraph()
-        # condy = {'compositions': [('share', ('group_1', ['a', 'b']))]}
-        # cut_x = so.Entity('x', self.map, self.request, self.container, condy)
-        # cut_y = so.Entity('y', self.map, self.request, self.container, condy)
-        # cut_k = so.Entity('k', self.map, self.request, self.container, condy)
-        # cut_l = so.Entity('k', self.map, self.request, self.container, condy)
-        # self.container.add_node(cut_x, self.x_attr)
-        # self.container.add_node(cut_y, self.y_attr)
-        # tmp = self.x_attr
-        # tmp['group_1'] = 'foo'
-        # self.container.add_node(cut_k, tmp)
-        # self.container.add_node(cut_l, tmp)
-        # self.container.add_edge(cut_x, cut_y)
-        # res, bids = cut_x.trigger({'assigned': {'a': ('k', 10.0),
-        #                                         'b': ('l', 10.0)},
-        #                            'bids': []}, 'init')
-        # self.assertEqual(bids['y']['b'], 1.25)  # 1 + 0.25 increase
-        # self.assertEqual(bids['x']['a'], 1.25)  # 1 + 0.25 increase
 
         # nshare
         # 1. a assigned, b no bid -> increase bid for b (50%)
@@ -221,22 +198,6 @@ class EntityTest(unittest.TestCase):
         self.assertEqual(res['b'][0], 'y')  # b should be stitched to y
         self.assertEqual(res['a'][1], 1.0)  # a sits fine on x
         self.assertEqual(res['a'][0], 'x')  # a should be stitched to x
-
-        # a,b assigned somewhere else. if there is a bid for a from x and I (y)
-        # do not share attr with x increase bid (25%).
-        # TODO: implement this.
-        # self.container = nx.DiGraph()
-        # condy = {'compositions': [('nshare', ('group_2', ['a', 'b']))]}
-        # cut_x = so.Entity('x', self.map, self.request, self.container, condy)
-        # cut_y = so.Entity('y', self.map, self.request, self.container, condy)
-        # self.container.add_node(cut_x, self.x_attr)
-        # self.container.add_node(cut_y, self.y_attr)
-        # self.container.add_edge(cut_x, cut_y)
-        # res, bids = cut_x.trigger({'assigned': {'a': ('k', 10.0),
-        #                                         'b': ('l', 10.0)},
-        #                            'bids': []}, 'init')
-        # self.assertEqual(bids['b'][1], 1.0)  # y should bit on b
-        # self.assertEqual(bids['a'][1], 1.25)  # x bid should increse by 0.25
 
 
 class SelfOptStitcherTest(unittest.TestCase):
@@ -288,4 +249,34 @@ class SelfOptStitcherTest(unittest.TestCase):
         self.assertIn(('Y', 'B'), res[0].edges())
         self.assertIn(('Z', 'B'), res[0].edges())
 
-        # TODO: complex test with 2 groups.
+        # complex test with two groups.
+        container = nx.DiGraph()
+        container.add_node('A', {'type': 'type_a', 'group': 'a', 'rank': 2})
+        container.add_node('B', {'type': 'type_b', 'group': 'a', 'rank': 3})
+        container.add_node('I', {'type': 'type_b', 'rank': 1})
+        # XXX: 'group': 'c' is incomplete should only works because I uplevel
+        # complete groups.
+        container.add_node('J', {'type': 'type_b', 'group': 'c', 'rank': 2})
+        container.add_node('X', {'type': 'type_b', 'group': 'b', 'rank': 2})
+        container.add_node('Y', {'type': 'type_a', 'group': 'b', 'rank': 5})
+        container.add_edge('A', 'B')
+        container.add_edge('B', 'I')
+        container.add_edge('I', 'J')
+        container.add_edge('J', 'X')
+        container.add_edge('X', 'Y')
+
+        request = nx.DiGraph()
+        request.add_node('1', {'type': 'type_x'})
+        request.add_node('2', {'type': 'type_y'})
+        request.add_edge('1', '2')
+
+        condy = {
+            'compositions': [('share', ('group', ['1', '2']))],
+            'attributes': [('lg', ('1', ('rank', 2))),
+                           ('lg', ('2', ('rank', 2)))]
+        }
+        for node in container.nodes():
+            res = self.cut.stitch(container, request, conditions=condy,
+                                  start=node)
+            self.assertIn(('1', 'Y'), res[0].edges())
+            self.assertIn(('2', 'X'), res[0].edges())

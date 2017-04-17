@@ -2,6 +2,7 @@
 Implements stitching, and filtering functions based on a bidding concept.
 """
 
+import copy
 import logging
 import re
 
@@ -76,7 +77,7 @@ def _same_condy(my_bids, param):
                 my_bids.pop(item)
 
 
-def _diff_condy(my_bids, assigned, all_bids, param):
+def _diff_condy(my_bids, param, assigned, all_bids):
     # if other entity has the others - I can increase my bid for the greater
     # good.
     for item in param:
@@ -98,22 +99,7 @@ def _diff_condy(my_bids, assigned, all_bids, param):
             my_bids.pop(item)
 
 
-def _share_condy(my_bids, assigned, param, node, container):
-    # TODO: this is sub optimal - should only bid higher if the set of
-    # stitches I would do instead of the existing one is better.
-    attrn = param[0]
-    attrv_assigned = None
-    nodes = param[1]
-    for item in nodes:
-        if item in assigned and attrv_assigned is None:
-            tmp = [n for n in container.nodes() if n.name == assigned[item][0]]
-            attrv_assigned = container.node[tmp[0]][attrn]
-        elif attrv_assigned is not None and item in my_bids \
-                and container.node[node][attrn] == attrv_assigned:
-            my_bids[item] = my_bids[item] * FACTOR_2
-
-
-def _nshare_condy(my_bids, assigned, param, node, container):
+def _nshare_condy(my_bids, param, assigned, node, container):
     attrn = param[0]
     attrv_assigned = None
     nodes = param[1]
@@ -125,30 +111,28 @@ def _nshare_condy(my_bids, assigned, param, node, container):
                 and container.node[node][attrn] != attrv_assigned:
             my_bids[item] = my_bids[item] * FACTOR_2
 
+CACHE = {}
 
-def _apply_conditions(my_bids, assigned, node, conditions, container):
-    """
-    Alter bids based on conditions.
-    """
-    if 'attributes' in conditions:
-        for item in conditions['attributes']:
-            condy = item[0]
-            param = item[1]
-            node_attr = container.node[node]
-            _attribute_condy(condy, my_bids, param, node_attr)
-    if 'compositions' in conditions:
-        for item in conditions['compositions']:
-            condy = item[0]
-            param = item[1]
-            if condy == 'same':
-                _same_condy(my_bids, param)
-            elif condy == 'diff':
-                _diff_condy(my_bids, assigned, node.bids, param)
-            elif condy == 'share':
-                _share_condy(my_bids, assigned, param, node, container)
-            elif condy == 'nshare':
-                _nshare_condy(my_bids, assigned, param, node, container)
-    return my_bids
+
+def _sub_stitch(container, request, mapping, condy):
+    if (container, request) not in CACHE:
+        opt_graph = nx.DiGraph()
+        tmp = {}
+        for node, attr in container.nodes(data=True):
+            tmp[node] = Entity(str(node), mapping, request, opt_graph,
+                               conditions=condy)
+            opt_graph.add_node(tmp[node], attr)
+        for src, trg, attr in container.edges(data=True):
+            opt_graph.add_edge(tmp[src], tmp[trg], attr)
+
+        start_node = tmp.values()[0]
+
+        # kick off
+        assign, _ = start_node.trigger({'bids': [], 'assigned': {}},
+                                       'sub-init')
+        CACHE[container, request] = assign
+
+    return CACHE[(container, request)]
 
 
 class Entity(object):
@@ -164,17 +148,95 @@ class Entity(object):
         self.bids = {}
         self.conditions = conditions or {}
 
+    def _share_condy(self, condy, param, my_bids, assigned):
+        """
+        If I know that mine and surrounding bids are lower than what another
+        combo can offer - drop bids & assignments!
+        """
+        attrn = param[0]
+        nodes = param[1]
+        if attrn not in self.container.node[self]:
+            for item in nodes:
+                if item in my_bids:
+                    my_bids.pop(item)
+            return
+        my_attrv = self.container.node[self][attrn]
+        bids = self.bids
+
+        cache = {}
+        # step 1) find possible groups that I know of.
+        for item in bids:
+            tmp = [n for n in self.container.nodes() if n.name == item][0]
+            if attrn in self.container.node[tmp]:
+                attrv = self.container.node[tmp][attrn]
+                if attrv not in cache:
+                    cache[attrv] = [tmp]
+                else:
+                    cache[attrv].append(tmp)
+
+        options = {}
+        # step 2) figure out what the groups are worth.
+        for item in cache:
+            sub_container = nx.subgraph(self.container, cache[item])
+            sub_request = nx.subgraph(self.request, nodes)
+            sub_condy = copy.deepcopy(self.conditions)
+            sub_condy['compositions'].remove(condy)
+            assign = _sub_stitch(sub_container, sub_request, self.mapping,
+                                 sub_condy)
+            if assign.keys() == nodes:
+                # is complete
+                options[item] = sum([val[1] for val in assign.values()])
+                for tmp in nodes:
+                    if tmp in my_bids and self in sub_container:
+                        my_bids[tmp] = my_bids[tmp] * FACTOR_2
+
+        # step 3) drop my bids & assignments.
+        res = []
+        if my_attrv in options and len(options) >= 2 \
+                and sorted(options, key=options.get,
+                           reverse=True)[0] != my_attrv:
+            for item in nodes:
+                if item in my_bids:
+                    my_bids.pop(item)
+                    res.append(item)
+            for item in nodes:
+                if item in assigned and assigned[item][0] == self.name:
+                    assigned.pop(item)
+        return res
+
+    def _apply_conditions(self, my_bids, assigned):
+        """
+        Alter bids based on conditions.
+        """
+        if 'attributes' in self.conditions:
+            for item in self.conditions['attributes']:
+                condy = item[0]
+                param = item[1]
+                node_attr = self.container.node[self]
+                _attribute_condy(condy, my_bids, param, node_attr)
+        if 'compositions' in self.conditions:
+            for item in self.conditions['compositions']:
+                condy = item[0]
+                param = item[1]
+                if condy == 'same':
+                    _same_condy(my_bids, param)
+                elif condy == 'diff':
+                    _diff_condy(my_bids, param, assigned, self.bids)
+                elif condy == 'share':
+                    self._share_condy(item, param, my_bids, assigned)
+                elif condy == 'nshare':
+                    _nshare_condy(my_bids, param, assigned,
+                                  self,
+                                  self.container)
+        return my_bids
+
     def _calc_credits(self, assigned):
         tmp = {}
         for node, attr in self.request.nodes(data=True):
             if self.mapping[attr['type']] == self.container.node[self]['type']:
                 tmp[node] = 1.0
         if len(tmp) > 0:
-            self.bids[self.name] = _apply_conditions(tmp,
-                                                     assigned,
-                                                     self,
-                                                     self.conditions,
-                                                     self.container)
+            self.bids[self.name] = self._apply_conditions(tmp, assigned)
         logging.info(self.name + ': current bids ' + repr(self.bids))
 
     def trigger(self, msg, src):
@@ -189,9 +251,8 @@ class Entity(object):
         # let's add those I didn't know of
         mod = msg['bids'] == self.bids
         for item in msg['bids']:
-            if item not in self.bids:
-                # Only pick bids from other - each entity controls own bids!
-                self.bids[item] = msg['bids'][item]
+            # each entity controls own bids!
+            self.bids[item] = msg['bids'][item]
 
         assigned = msg['assigned']
         self._calc_credits(assigned)
@@ -218,13 +279,15 @@ class Entity(object):
                 neighbour.trigger(src=self.name,
                                   msg={'bids': self.bids,
                                        'assigned': assigned})
-            elif msg is not None and self.name not in msg['bids'] \
-                    and self.name in self.bids:
+            elif msg is not None and msg['bids'] != self.bids:
                 # only call my caller back when he didn't knew me.
                 neighbour.trigger(src=self.name,
                                   msg={'bids': self.bids,
                                        'assigned': assigned})
         return assigned, self.bids
+
+    def __repr__(self):
+        return self.name
 
 
 class SelfOptStitcher(stitcher.Stitcher):
@@ -237,7 +300,7 @@ class SelfOptStitcher(stitcher.Stitcher):
         opt_graph = nx.DiGraph()
         tmp = {}
         for node, attr in container.nodes(data=True):
-            tmp[node] = Entity(node, self.rels, request, opt_graph,
+            tmp[node] = Entity(str(node), self.rels, request, opt_graph,
                                conditions=condy)
             opt_graph.add_node(tmp[node], attr)
         for src, trg, attr in container.edges(data=True):

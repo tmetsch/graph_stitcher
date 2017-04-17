@@ -119,8 +119,13 @@ validation are shown as titles of the graphs.
 To test the evolutionary algorithm run:
 
     $ ./run_me.py -a evolutionary
-    
+
 Please note that it might not always find a set of good solutions, as the 
 container and the request are pretty small. Also note that currently the 
 fitness function expresses a fitness for the given conditions; and does not 
 include a fitness value for the validation phase.
+
+To test the bidding algorithm in which the container nodes try to find the 
+optimal solution run:
+
+    $ ./run_me.py -a self_opt

@@ -2,7 +2,8 @@
 # Algorithms
 
 The following section describe the different approaches for stitching the 
-request graph to the container graph.
+request graph to the container graph. Note that container graphs could be 
+sub-graphs of larger graph for performance reasons.
 
 ## Full solution
 

@@ -3,7 +3,7 @@
 
 The following section describe the different approaches for stitching the 
 request graph to the container graph. Note that container graphs could be 
-sub-graphs of larger graph for performance reasons.
+sub-graphs of larger container graph for performance reasons.
 
 ## Full solution
 
@@ -82,7 +82,9 @@ auction (This could be flipped to a
 concept the nodes in the container bid on the node in the request, and hence 
 eventually express a interest in for a stitch. By bidding credits the nodes in 
 the container can hide their actually capabilities and just express as 
-interest in the form of a value.
+interest in the form of a value. The more
+[intelligence](https://en.wikipedia.org/wiki/Intelligent_agent) is implemented 
+in the node, the better it can calculate it's bids.
 
 The algorithm starts by traversing the container graph and each node 
 calculates it's bids. During traversal the current assignments and bids from 
@@ -93,7 +95,7 @@ surrounding environment (especially in cases in which the  same, diff, share,
 nshare conditions are used). Hence they not only need to know about the 
 current assignments, but also the neighbours bids. 
 
-For the simple larger and smaller then conditions, th larger the delta between 
+For the simple larger and smaller then conditions, the larger the delta between 
 what the node in the request graphs asks for (through the conditions) and what 
 the node in the container offers, the higher the bid is. In the case of 
 conditions that express that nodes in the request need to be stitched to the 
@@ -129,7 +131,10 @@ specific use cases it is encourage to change how the credits are calculated.
 For example based on the utility of the container node. Especially for the 
 share attribute condition there might be cases that the algorithm does not 
 find the optimal solution. As the increasing percentages (50%, 25%) are not 
-optimal.   
+optimal. The time complexity depends on the number of nodes in the container 
+graph, their structure and how often bids & assignment change. This is 
+because currently the container graph is traversed synchronously. In future 
+a async approach would be beneficial. 
 
 [1]: https://www.cs.ox.ac.uk/people/michael.wooldridge/pubs/imas/IMAS2e.html 
     "An Introduction to MultiAgent Systems."

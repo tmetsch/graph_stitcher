@@ -100,7 +100,8 @@ The following dictionary can be passed in as a composition condition:
 
 This graph stitcher is mostly developed to test & play around. Also to check if
 [evolutionary algorithms](https://en.wikipedia.org/wiki/Evolutionary_algorithm)
-can be developed to determine the best resulting graph.
+can be developed to determine the best resulting graph. More details on the 
+algorithms in place can be found in the [/docs](/docs/) directory.
 
 ## Running it
 
@@ -128,4 +129,4 @@ include a fitness value for the validation phase.
 To test the bidding algorithm in which the container nodes try to find the 
 optimal solution run:
 
-    $ ./run_me.py -a self_opt
+    $ ./run_me.py -a bidding

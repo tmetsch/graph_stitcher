@@ -12,7 +12,7 @@ import logging
 from networkx.readwrite import json_graph
 
 from stitcher import evolutionary
-from stitcher import self_optimization as so
+from stitcher import bidding
 from stitcher import stitch
 from stitcher import validators
 from stitcher import vis
@@ -36,10 +36,10 @@ def main(algo):
         # to show the true power of this :-)
         conditions = {'compositions': [('diff', ('k', 'l'))]}
         stitcher = evolutionary.EvolutionarySticher()
-    elif algo == 'self_opt':
+    elif algo == 'bidding':
         # to show the true power of this :-)
         conditions = {'attributes': [('lt', ('l', ('rank', 9)))]}
-        stitcher = so.SelfOptStitcher()
+        stitcher = bidding.BiddingStitcher()
     else:
         stitcher = stitch.GlobalStitcher()
     graphs = stitcher.stitch(container, request, conditions=conditions)
@@ -51,7 +51,7 @@ def main(algo):
 
 
 if __name__ == '__main__':
-    options = ['global', 'evolutionary', 'self_opt']
+    options = ['global', 'evolutionary', 'bidding']
     parser = argparse.ArgumentParser()
     parser.add_argument('-a', choices=options, default='global',
                         help='Select the type of stitching algorithm.')

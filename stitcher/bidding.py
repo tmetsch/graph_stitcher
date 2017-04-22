@@ -290,9 +290,10 @@ class Entity(object):
         return self.name
 
 
-class SelfOptStitcher(stitcher.Stitcher):
+class BiddingStitcher(stitcher.Stitcher):
     """
-    Stitcher based on a bidding concept.
+    Stitcher based on a bidding concept where each Agent of MAS bids for nodes
+    from the request graph.
     """
 
     def stitch(self, container, request, conditions=None, start=None):

@@ -1,5 +1,5 @@
 """
-Unittest for the self_optimization module.
+Unittest for the bidding module.
 """
 
 import logging
@@ -7,7 +7,7 @@ import unittest
 
 import networkx as nx
 
-from stitcher import self_optimization as so
+from stitcher import bidding
 
 FORMAT = "%(asctime)s - %(filename)s - %(lineno)s - " \
          "%(levelname)s - %(message)s"
@@ -44,7 +44,7 @@ class EntityTest(unittest.TestCase):
         """
         Test trigger for success.
         """
-        cut = so.Entity('x', self.map, self.request, self.container)
+        cut = bidding.Entity('x', self.map, self.request, self.container)
         self.container.add_node(cut, self.x_attr)
         cut.trigger({'assigned': {}, 'bids': []}, 'init')
 
@@ -60,7 +60,7 @@ class EntityTest(unittest.TestCase):
         """
         # test calculation of credits to bid.
         # no conditions
-        cut = so.Entity('x', self.map, self.request, self.container)
+        cut = bidding.Entity('x', self.map, self.request, self.container)
         self.container.add_node(cut, self.x_attr)
         res, bids = cut.trigger({'assigned': {}, 'bids': {}}, 'init')
         self.assertEqual(res['a'][1], 1.0)  # 1 because type matches.
@@ -69,7 +69,8 @@ class EntityTest(unittest.TestCase):
         # lg
         self.container = nx.DiGraph()
         condy = {'attributes': [('lg', ('a', ('foo', 1)))]}
-        cut = so.Entity('x', self.map, self.request, self.container, condy)
+        cut = bidding.Entity('x', self.map, self.request, self.container,
+                             condy)
         self.container.add_node(cut, self.x_attr)
         res, bids = cut.trigger({'assigned': {}, 'bids': []}, 'init')
         self.assertEqual(res['a'][1], 3.0)  # rank 3 - rank 1 + 1 for type = 2
@@ -77,7 +78,8 @@ class EntityTest(unittest.TestCase):
         # lt
         self.container = nx.DiGraph()
         condy = {'attributes': [('lt', ('a', ('foo', 9)))]}
-        cut = so.Entity('x', self.map, self.request, self.container, condy)
+        cut = bidding.Entity('x', self.map, self.request, self.container,
+                             condy)
         self.container.add_node(cut, self.x_attr)
         res, bids = cut.trigger({'assigned': {}, 'bids': []}, 'init')
         self.assertEqual(res['a'][1], 7.0)  # 9-3+1=7
@@ -85,7 +87,8 @@ class EntityTest(unittest.TestCase):
         # eq
         self.container = nx.DiGraph()
         condy = {'attributes': [('eq', ('a', ('foo', 2)))]}
-        cut = so.Entity('x', self.map, self.request, self.container, condy)
+        cut = bidding.Entity('x', self.map, self.request, self.container,
+                             condy)
         self.container.add_node(cut, self.x_attr)
         res, _ = cut.trigger({'assigned': {}, 'bids': []}, 'init')
         self.assertNotIn('a', bids)  # popped because not equal.
@@ -93,7 +96,8 @@ class EntityTest(unittest.TestCase):
         # neq
         self.container = nx.DiGraph()
         condy = {'attributes': [('neq', ('a', ('group_1', 'group_a')))]}
-        cut = so.Entity('x', self.map, self.request, self.container, condy)
+        cut = bidding.Entity('x', self.map, self.request, self.container,
+                             condy)
         self.container.add_node(cut, self.x_attr)
         res, _ = cut.trigger({'assigned': {}, 'bids': []}, 'init')
         self.assertNotIn('a', bids)  # popped because equal.
@@ -101,7 +105,8 @@ class EntityTest(unittest.TestCase):
         # regex
         self.container = nx.DiGraph()
         condy = {'attributes': [('regex', ('a', ('group_1', '^z')))]}
-        cut = so.Entity('x', self.map, self.request, self.container, condy)
+        cut = bidding.Entity('x', self.map, self.request, self.container,
+                             condy)
         self.container.add_node(cut, self.x_attr)
         res, _ = cut.trigger({'assigned': {}, 'bids': []}, 'init')
         self.assertNotIn('a', bids)  # popped because z not in group name.
@@ -110,7 +115,8 @@ class EntityTest(unittest.TestCase):
         # 1. nothing assigned -> increase bit for both (50%)
         self.container = nx.DiGraph()
         condy = {'compositions': [('same', ['b', 'c'])]}
-        cut = so.Entity('y', self.map, self.request, self.container, condy)
+        cut = bidding.Entity('y', self.map, self.request, self.container,
+                             condy)
         self.container.add_node(cut, self.y_attr)
         res, bids = cut.trigger({'assigned': {}, 'bids': []}, 'init')
         self.assertEqual(res['b'][1], 1.5)  # 1 + 0.5 increase
@@ -119,7 +125,8 @@ class EntityTest(unittest.TestCase):
         # 1. nothing assigned -> increase bit for both (50%)
         self.container = nx.DiGraph()
         condy = {'compositions': [('same', ['a', 'c'])]}
-        cut = so.Entity('y', self.map, self.request, self.container, condy)
+        cut = bidding.Entity('y', self.map, self.request, self.container,
+                             condy)
         self.container.add_node(cut, self.y_attr)
         res, bids = cut.trigger({'assigned': {}, 'bids': []}, 'init')
         self.assertTrue('a' not in bids['y'])  # not bid on a
@@ -133,7 +140,8 @@ class EntityTest(unittest.TestCase):
         # 1. nothing assigned -> drop one bid
         self.container = nx.DiGraph()
         condy = {'compositions': [('diff', ['b', 'c'])]}
-        cut = so.Entity('y', self.map, self.request, self.container, condy)
+        cut = bidding.Entity('y', self.map, self.request, self.container,
+                             condy)
         self.container.add_node(cut, self.y_attr)
         res, bids = cut.trigger({'assigned': {}, 'bids': []}, 'init')
         self.assertEqual(res['c'][1], 1.0)  # 1 (type)
@@ -142,8 +150,10 @@ class EntityTest(unittest.TestCase):
         # 2. a assigned, b no bid -> increase bid for b (50%)
         self.container = nx.DiGraph()
         condy = {'compositions': [('diff', ['a', 'c'])]}
-        cut_x = so.Entity('x', self.map, self.request, self.container, condy)
-        cut_y = so.Entity('y', self.map, self.request, self.container, condy)
+        cut_x = bidding.Entity('x', self.map, self.request, self.container,
+                               condy)
+        cut_y = bidding.Entity('y', self.map, self.request, self.container,
+                               condy)
         self.container.add_node(cut_x, self.x_attr)
         self.container.add_node(cut_y, self.y_attr)
         self.container.add_edge(cut_x, cut_y)
@@ -157,8 +167,10 @@ class EntityTest(unittest.TestCase):
         # increase bid a bit (25%)
         self.container = nx.DiGraph()
         condy = {'compositions': [('diff', ['a', 'c'])]}
-        cut_x = so.Entity('x', self.map, self.request, self.container, condy)
-        cut_y = so.Entity('y', self.map, self.request, self.container, condy)
+        cut_x = bidding.Entity('x', self.map, self.request, self.container,
+                               condy)
+        cut_y = bidding.Entity('y', self.map, self.request, self.container,
+                               condy)
         self.container.add_node(cut_x, self.x_attr)
         self.container.add_node(cut_y, self.y_attr)
         self.container.add_edge(cut_x, cut_y)
@@ -172,8 +184,10 @@ class EntityTest(unittest.TestCase):
         # 1. a assigned to x, I share attr with x -> increase bid (50%)
         self.container = nx.DiGraph()
         condy = {'compositions': [('share', ('group_1', ['a', 'b']))]}
-        cut_x = so.Entity('x', self.map, self.request, self.container, condy)
-        cut_y = so.Entity('y', self.map, self.request, self.container, condy)
+        cut_x = bidding.Entity('x', self.map, self.request, self.container,
+                               condy)
+        cut_y = bidding.Entity('y', self.map, self.request, self.container,
+                               condy)
         self.container.add_node(cut_x, self.x_attr)
         self.container.add_node(cut_y, self.y_attr)
         self.container.add_edge(cut_x, cut_y)
@@ -187,8 +201,10 @@ class EntityTest(unittest.TestCase):
         # 1. a assigned, b no bid -> increase bid for b (50%)
         self.container = nx.DiGraph()
         condy = {'compositions': [('nshare', ('group_2', ['a', 'b']))]}
-        cut_x = so.Entity('x', self.map, self.request, self.container, condy)
-        cut_y = so.Entity('y', self.map, self.request, self.container, condy)
+        cut_x = bidding.Entity('x', self.map, self.request, self.container,
+                               condy)
+        cut_y = bidding.Entity('y', self.map, self.request, self.container,
+                               condy)
         self.container.add_node(cut_x, self.x_attr)
         self.container.add_node(cut_y, self.y_attr)
         self.container.add_edge(cut_x, cut_y)
@@ -200,13 +216,13 @@ class EntityTest(unittest.TestCase):
         self.assertEqual(res['a'][0], 'x')  # a should be stitched to x
 
 
-class SelfOptStitcherTest(unittest.TestCase):
+class BiddingStitcherTest(unittest.TestCase):
     """
-    Testcase for the SelfOptStitcher class.
+    Testcase for the BiddingStitcher class.
     """
 
     def setUp(self):
-        self.cut = so.SelfOptStitcher()
+        self.cut = bidding.BiddingStitcher()
         self.cut.rels = {'type_x': 'type_a',
                          'type_y': 'type_b',
                          'type_z': 'type_c'}

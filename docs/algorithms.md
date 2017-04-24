@@ -26,7 +26,7 @@ The [evolutionary](https://en.wikipedia.org/wiki/Evolutionary_algorithm)
 algorithm for finding possible solutions uses a more 
 [darwinism](https://en.wikipedia.org/wiki/Darwinism) based approach. Random 
 candidates are created which are put into an initial population. Out of that 
-initial population the best candidates survive, while the other die off. A 
+initial population the best candidates survive, while the others die off. A 
 candidate is defined by it's genes. Whereby a gene set of a candidate 
 represent it's individual stitches. 
 
@@ -61,8 +61,8 @@ algorithm finds good solutions fast.
 
 It is suggested to write more advanced fitness functions which eventually will 
 obsolete the validation run as needed in the full solution approach. Making 
-the validation step obsolete obsolete can be done by e.g. including the 
-include the number of nodes & edges in the fitness value.
+the validation step obsolete can be done by e.g. including the include the 
+number of nodes & edges in the fitness value.
 
 Mutation is done by randomly changing certain stitches to different targets.
  
@@ -74,15 +74,15 @@ is necessary to tune the parameters introduced earlier to the use case at hand.
 
 ## Bidding
 
-The nodes in the container, just like in a Multi-Agent System [1](1) pursue a 
+The nodes in the container, just like in a Multi-Agent System [1](1), pursue a 
 certain self-interest, as well as an interest to be able to stitch the request 
 collectively. Using a [english](https://en.wikipedia.org/wiki/English_auction)
 auction (This could be flipped to a 
-[dutch](https://en.wikipedia.org/wiki/Dutch_auction) one easily as well) 
-concept the nodes in the container bid on the node in the request, and hence 
-eventually express a interest in for a stitch. By bidding credits the nodes in 
-the container can hide their actually capabilities and just express as 
-interest in the form of a value. The more
+[dutch](https://en.wikipedia.org/wiki/Dutch_auction) one as well) concept the 
+nodes in the container bid on the node in the request, and hence eventually 
+express a interest in for a stitch. By bidding credits the nodes in 
+the container can hide their actually capabilities, capacities and just 
+express as interest in the form of a value. The more
 [intelligence](https://en.wikipedia.org/wiki/Intelligent_agent) is implemented 
 in the node, the better it can calculate it's bids.
 
@@ -91,24 +91,25 @@ calculates it's bids. During traversal the current assignments and bids from
 other nodes are 'gossiped' along. The amount of credits bid, depends on if the 
 node in the request graph matches the type requirement and how well the stitch 
 fits. The nodes in the container need to base their bids on the bids of their
-surrounding environment (especially in cases in which the  same, diff, share, 
-nshare conditions are used). Hence they not only need to know about the 
-current assignments, but also the neighbours bids. 
+surrounding environment (especially in cases in which the _same_, _diff_, 
+_share_, _nshare_ conditions are used). Hence they not only need to know about 
+the current assignments, but also the neighbours bids. 
 
-For the simple larger and smaller then conditions, the larger the delta between 
+For the simple _lg_ and _lt_ conditions, the larger the delta between 
 what the node in the request graphs asks for (through the conditions) and what 
-the node in the container offers, the higher the bid is. In the case of 
-conditions that express that nodes in the request need to be stitched to the 
-same or different container node, the credits are calculated based on the 
-container node's knowledge about other bids, and what is currently assigned. 
-Should the request node be assigned elsewhere (and the different conditions 
-is in place) the current container node will increase it's bid by 50%. Does 
-the current container node know about a bid from another node, it will increase 
-it's bid by 25%. Whenever a current bid for a request node's stitch tot the 
-container is higher the assignment is updated.
+the node in the container offers, the higher the bid is. Whenever a current 
+bid for a request node's stitch to the container is higher than the current 
+assignment, the same is updated. In the case of conditions that express that 
+nodes in the request need to be stitched to the same or different container 
+node, the credits are calculated based on the container node's knowledge about 
+other bids, and what is currently assigned. Should a pair of request node be 
+stitched - with the _diff_ conditions in place - the current container node 
+will increase it's bid by 50%, if one is already assigned somewhere else. Does 
+the current container node know about a bid from another node, it will 
+increase it's bid by 25%. 
 
 For example a container with nodes A, B, C, D needs to be stitched to a 
-request of nodes X, Y. For X, Y there is a share filter defined - which 
+request of nodes X, Y. For X, Y there is a _share_ filter defined - which 
 either A & B, or C & D can fulfill. Let's assume A bids 5 credits for
 X, and B bids 2 credits for Y, and C bids 4 credits for X and D bids 6
 credits for Y. Hence the group C & D would be the better fit. When evaluating 
@@ -116,7 +117,7 @@ D, D needs to know X is currently assigned to A - but also needs to know the
 bid of C so is can increase it's bid on Y. When C is revisited it can increase 
 it's bid given D has Y assigned. As soon as the nodes A & B are revisited they 
 will eventually drop their bids, as they now know C & D can serve the request 
-X, Y better. The hence sacrifice their bis for the needs of the greater good. 
+X, Y better. They hence sacrifice their bis for the needs of the greater good. 
 So the fact sth is assigned to a neighbour matters more then the bid of the 
 neighbour (increase by 50%) - but still, the knowledge of the neighbour's bid 
 is crucial (increase by 25%) - e.g. if bid from C would be 0, D should not 
@@ -129,12 +130,13 @@ the node knows about includes a bid that can help it's own bid.
 Note this algorithm does not guarantee stability. Also for better results in 
 specific use cases it is encourage to change how the credits are calculated. 
 For example based on the utility of the container node. Especially for the 
-share attribute condition there might be cases that the algorithm does not 
-find the optimal solution. As the increasing percentages (50%, 25%) are not 
+_share_ attribute condition there might be cases that the algorithm does not 
+find the optimal solution, as the increasing percentages (50%, 25%) are not 
 optimal. The time complexity depends on the number of nodes in the container 
 graph, their structure and how often bids & assignment change. This is 
-because currently the container graph is traversed synchronously. In future 
-a async approach would be beneficial. 
+because currently the container graph is traversed synchronously. In future a 
+async approach would be beneficial, which will also allow for parallel 
+calculation of bids.
 
 [1]: https://www.cs.ox.ac.uk/people/michael.wooldridge/pubs/imas/IMAS2e.html 
     "An Introduction to MultiAgent Systems."

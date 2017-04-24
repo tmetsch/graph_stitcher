@@ -101,7 +101,7 @@ The following dictionary can be passed in as a composition condition:
 This graph stitcher is mostly developed to test & play around. Also to check if
 [evolutionary algorithms](https://en.wikipedia.org/wiki/Evolutionary_algorithm)
 can be developed to determine the best resulting graph. More details on the 
-algorithms in place can be found in the [/docs](/docs/) directory.
+algorithms in place can be found in the [/docs](/docs/algorithms.md) directory.
 
 ## Running it
 

@@ -1,6 +1,8 @@
 {
   "directed": true, 
-  "graph": {}, 
+  "graph": {
+    "multigraph": true
+  }, 
   "nodes": [
     {
       "type": "a", 
@@ -45,36 +47,36 @@
   ], 
   "links": [
     {
-      "source": 0, 
-      "target": 1
+      "source": "A", 
+      "target": "C"
     }, 
     {
-      "source": 2, 
-      "target": 1
+      "source": "B", 
+      "target": "C"
     }, 
     {
-      "source": 3, 
-      "target": 4
+      "source": "E", 
+      "target": "D"
     }, 
     {
-      "source": 4, 
-      "target": 1
+      "source": "D", 
+      "target": "C"
     }, 
     {
-      "source": 5, 
-      "target": 4
+      "source": "F", 
+      "target": "D"
     }, 
     {
-      "source": 6, 
-      "target": 0
+      "source": "1", 
+      "target": "A"
     }, 
     {
-      "source": 6, 
-      "target": 7
+      "source": "1", 
+      "target": "2"
     }, 
     {
-      "source": 7, 
-      "target": 1
+      "source": "2", 
+      "target": "C"
     }
   ], 
   "multigraph": false

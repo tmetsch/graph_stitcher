@@ -72,19 +72,20 @@ class TestGraphCandidate(unittest.TestCase):
 
     def setUp(self):
         self.container = nx.DiGraph()
-        self.container.add_node('1', {'type': 'a', 'group': 'foo', 'foo': 3,
-                                      'retest': 'aaa'})
-        self.container.add_node('2', {'type': 'a', 'group': 'foo'})
-        self.container.add_node('3', {'type': 'a', 'foo': 5, 'retest': 'bbb'})
-        self.container.add_node('4', {'type': 'b', 'group': 'foo'})
-        self.container.add_node('5', {'type': 'b', 'group': 'bar'})
-        self.container.add_node('6', {'type': 'b', 'group': 'bar'})
+        self.container.add_node('1', **{'type': 'a', 'group': 'foo', 'foo': 3,
+                                        'retest': 'aaa'})
+        self.container.add_node('2', **{'type': 'a', 'group': 'foo'})
+        self.container.add_node('3', **{'type': 'a', 'foo': 5,
+                                        'retest': 'bbb'})
+        self.container.add_node('4', **{'type': 'b', 'group': 'foo'})
+        self.container.add_node('5', **{'type': 'b', 'group': 'bar'})
+        self.container.add_node('6', **{'type': 'b', 'group': 'bar'})
 
         self.request = nx.DiGraph()
-        self.request.add_node('a', {'type': 'x'})
-        self.request.add_node('b', {'type': 'x'})
-        self.request.add_node('c', {'type': 'y'})
-        self.request.add_node('d', {'type': 'y'})
+        self.request.add_node('a', **{'type': 'x'})
+        self.request.add_node('b', **{'type': 'x'})
+        self.request.add_node('c', **{'type': 'y'})
+        self.request.add_node('d', **{'type': 'y'})
 
         self.stitch = {'x': 'a', 'y': 'b'}  # stitch x -> a and y -> b
 
@@ -308,7 +309,7 @@ class TestGraphCandidate(unittest.TestCase):
         self.assertDictEqual(child.gen, partner.gen)
 
         # partner has a only non valid mappings
-        self.container.add_node('y', {'type': 'boo'})
+        self.container.add_node('y', **{'type': 'boo'})
         partner = evolutionary.GraphCandidate({'a': 'y'},
                                               self.stitch, {}, [],
                                               self.request, self.container)

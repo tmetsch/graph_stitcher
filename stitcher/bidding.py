@@ -111,6 +111,7 @@ def _nshare_condy(my_bids, param, assigned, node, container):
                 and container.node[node][attrn] != attrv_assigned:
             my_bids[item] = my_bids[item] * FACTOR_2
 
+
 CACHE = {}
 
 
@@ -121,9 +122,9 @@ def _sub_stitch(container, request, mapping, condy):
         for node, attr in container.nodes(data=True):
             tmp[node] = Entity(str(node), mapping, request, opt_graph,
                                conditions=condy)
-            opt_graph.add_node(tmp[node], attr)
+            opt_graph.add_node(tmp[node], **attr)
         for src, trg, attr in container.edges(data=True):
-            opt_graph.add_edge(tmp[src], tmp[trg], attr)
+            opt_graph.add_edge(tmp[src], tmp[trg], **attr)
 
         start_node = tmp.values()[0]
 
@@ -159,7 +160,7 @@ class Entity(object):
             for item in nodes:
                 if item in my_bids:
                     my_bids.pop(item)
-            return
+            return []
         my_attrv = self.container.node[self][attrn]
         bids = self.bids
 
@@ -235,7 +236,7 @@ class Entity(object):
         for node, attr in self.request.nodes(data=True):
             if self.mapping[attr['type']] == self.container.node[self]['type']:
                 tmp[node] = 1.0
-        if len(tmp) > 0:
+        if tmp:
             self.bids[self.name] = self._apply_conditions(tmp, assigned)
         logging.info(self.name + ': current bids ' + repr(self.bids))
 
@@ -246,7 +247,7 @@ class Entity(object):
         :param msg: dict containing the message from other entity.
         :param src: str indicating the src of where the message comes from.
         """
-        logging.info(str(src) + ' -> ' + str(self.name) + ' msg: ' + str(msg))
+        logging.info('%s -> %s msg: %s', str(src), str(self.name), str(msg))
 
         # let's add those I didn't know of
         mod = msg['bids'] == self.bids
@@ -303,9 +304,9 @@ class BiddingStitcher(stitcher.Stitcher):
         for node, attr in container.nodes(data=True):
             tmp[node] = Entity(str(node), self.rels, request, opt_graph,
                                conditions=condy)
-            opt_graph.add_node(tmp[node], attr)
+            opt_graph.add_node(tmp[node], **attr)
         for src, trg, attr in container.edges(data=True):
-            opt_graph.add_edge(tmp[src], tmp[trg], attr)
+            opt_graph.add_edge(tmp[src], tmp[trg], **attr)
 
         start_node = tmp.values()[0]
         if start is not None:

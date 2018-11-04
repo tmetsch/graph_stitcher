@@ -282,7 +282,7 @@ class GlobalStitcher(stitcher.Stitcher):
             for item in edge_list:
                 edges.append((keys[j], item))
                 j += 1
-            if len(edges) > 0:
+            if edges:
                 candidate_edges[str(edges)] = edges
 
         # 3. (optional step): filter

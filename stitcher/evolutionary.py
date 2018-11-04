@@ -337,7 +337,7 @@ class BasicEvolution(object):
             i = random.randint(len_new_pop, len_pop - 1)
             new_population[i].mutate()
 
-        LOG.debug('New population length: ' + str(len(new_population)))
+        LOG.debug('New population length: %s', str(len(new_population)))
         return new_population
 
     def run(self, population, max_runs, fitness_goal=0.0, stabilizer=False):
@@ -357,13 +357,13 @@ class BasicEvolution(object):
         fitness_sum = 0.0
         population.sort(key=lambda candidate: candidate.fitness())
         while iteration <= max_runs:
-            LOG.debug('Iteration: ' + str(iteration))
+            LOG.debug('Iteration: %s', str(iteration))
 
             population = self._darwin(population)
             population.sort(key=lambda candidate: candidate.fitness())
 
             if population[0].fitness() == fitness_goal:
-                LOG.info('Found solution in iteration: ' + str(iteration))
+                LOG.info('Found solution in iteration: %s', str(iteration))
                 break
 
             if stabilizer:
@@ -371,7 +371,7 @@ class BasicEvolution(object):
                                       candidate in population)
                 if new_fitness_sum == fitness_sum:
                     # in the last solution all died...
-                    LOG.info('Population stabilized after iteration: ' +
+                    LOG.info('Population stabilized after iteration: %s',
                              str(iteration - 1))
                     break
                 fitness_sum = new_fitness_sum
@@ -381,7 +381,7 @@ class BasicEvolution(object):
         # show results
         if iteration >= max_runs:
             LOG.warn('Maximum number of iterations reached')
-        LOG.info('Final population: ' + repr(population))
+        LOG.info('Final population: %s', repr(population))
         return iteration, population
 
 
@@ -421,7 +421,7 @@ class EvolutionarySticher(stitcher.Stitcher):
         for _ in range(self.candidates):
             tmp = {}
             for item in request.nodes():
-                trg_cand = random.choice(container.nodes())
+                trg_cand = random.choice(container.nodes().keys())
                 tmp[item] = trg_cand
             population.append(GraphCandidate(tmp, self.rels, conditions, [],
                                              request, container))

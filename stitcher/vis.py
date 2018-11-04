@@ -38,7 +38,7 @@ def show(graphs, request, titles, prog='neato', size=None,
         axarr[x_val, y_val].xaxis.set_ticks([])
         axarr[x_val, y_val].yaxis.set_ticks([])
         axarr[x_val, y_val].set_title(titles[index])
-        axarr[x_val, y_val].set_axis_bgcolor("white")
+#        axarr[x_val, y_val].set_axis_bgcolor("white")
         if not type_format:
             type_format = TYPE_FORMAT
         _plot_subplot(candidate, request.nodes(), prog, type_format,

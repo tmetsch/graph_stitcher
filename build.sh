@@ -1,6 +1,6 @@
 #!/bin/sh
 
-pep8 -r **/*.py
+pycodestyle -r **/*.py
 
 pylint -r n **/*.py
 

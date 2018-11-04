@@ -19,16 +19,16 @@ class TestFilteringConditions(unittest.TestCase):
 
     def setUp(self):
         self.container = nx.DiGraph()
-        self.container.add_node('1', {'type': 'a', 'foo': 'x', 'bar': 5,
-                                      'retest': 'abcde'})
-        self.container.add_node('2', {'type': 'a', 'foo': 'y', 'bar': 7})
-        self.container.add_node('3', {'type': 'b', 'foo': 'x'})
+        self.container.add_node('1', **{'type': 'a', 'foo': 'x', 'bar': 5,
+                                        'retest': 'abcde'})
+        self.container.add_node('2', **{'type': 'a', 'foo': 'y', 'bar': 7})
+        self.container.add_node('3', **{'type': 'b', 'foo': 'x'})
         self.container.add_edge('1', '2')
         self.container.add_edge('2', '3')
 
         self.request = nx.DiGraph()
-        self.request.add_node('a', {'type': 'x'})
-        self.request.add_node('b', {'type': 'y'})
+        self.request.add_node('a', **{'type': 'x'})
+        self.request.add_node('b', **{'type': 'y'})
         self.request.add_edge('a', 'b')
 
         self.cut = stitch.GlobalStitcher()
@@ -130,9 +130,9 @@ class TestFilteringConditions(unittest.TestCase):
         # no options left.
         self.assertEquals(len(res1), 0)
 
-        self.container.add_node('4', {'type': 'b', 'foo': 'x'})
+        self.container.add_node('4', **{'type': 'b', 'foo': 'x'})
         self.container.add_edge('3', '4')
-        self.request.add_node('c', {'type': 'y'})
+        self.request.add_node('c', **{'type': 'y'})
         self.request.add_edge('b', 'c')
 
         # node c & b to be stitched to same target!
@@ -180,19 +180,19 @@ class TestFilteringConditions(unittest.TestCase):
         Test filter for sanity with a more complex setup.
         """
         container = nx.DiGraph()
-        container.add_node('a', {'type': 'a', 'group': '1', 'geo': 'eu'})
-        container.add_node('b', {'type': 'b', 'group': '1', 'geo': 'us'})
-        container.add_node('c', {'type': 'a', 'group': '2'})
-        container.add_node('d', {'type': 'b', 'group': '2'})
-        container.add_node('e', {'type': 'b'})
+        container.add_node('a', **{'type': 'a', 'group': '1', 'geo': 'eu'})
+        container.add_node('b', **{'type': 'b', 'group': '1', 'geo': 'us'})
+        container.add_node('c', **{'type': 'a', 'group': '2'})
+        container.add_node('d', **{'type': 'b', 'group': '2'})
+        container.add_node('e', **{'type': 'b'})
         container.add_edge('a', 'b')
         container.add_edge('b', 'c')
         container.add_edge('c', 'd')
 
         request = nx.DiGraph()
-        request.add_node('1', {'type': 'x'})
-        request.add_node('2', {'type': 'y'})
-        request.add_node('3', {'type': 'y'})
+        request.add_node('1', **{'type': 'x'})
+        request.add_node('2', **{'type': 'y'})
+        request.add_node('3', **{'type': 'y'})
         request.add_edge('1', '2')
         request.add_edge('1', '3')
 
@@ -261,7 +261,7 @@ class TestGlobalStitcher(unittest.TestCase):
 
         # let's add a node to the request which does not require to be
         # stitched to the container. Hence added edges = 3!
-        self.request.add_node('n', {'type': 'foo', 'rank': 7})
+        self.request.add_node('n', **{'type': 'foo', 'rank': 7})
         self.request.add_edge('k', 'n')
         self.request.add_edge('n', 'l')
 

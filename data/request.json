@@ -1,6 +1,8 @@
 {
   "directed": true, 
-  "graph": {}, 
+  "graph": {
+    "multigraph": true
+  }, 
   "nodes": [
     {
       "type": "x", 
@@ -20,12 +22,12 @@
   ], 
   "links": [
     {
-      "source": 0, 
-      "target": 2
+      "source": "k", 
+      "target": "l"
     }, 
     {
-      "source": 2, 
-      "target": 1
+      "source": "l", 
+      "target": "m"
     }
   ], 
   "multigraph": false

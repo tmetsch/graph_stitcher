@@ -1,5 +1,5 @@
 # Install using: pip install -r requirements.txt
 matplotlib>=1.4.2
-networkx>=1.11
+networkx>=2.1
 pygraphviz>=1.3rc2
 pydot>=1.0.32

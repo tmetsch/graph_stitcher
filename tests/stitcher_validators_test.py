@@ -89,5 +89,5 @@ class TestNodeRankSticher(unittest.TestCase):
         res2 = validators.validate_incoming_rank(res1, {'a': (0, 3)})
 
         self.assertTrue(len(res2) == 8)
-        self.assertEquals(res2[4],
-                          'node B rank is >= 3 and # incoming edges is > 0')
+        self.assertEqual(res2[4],
+                         'node B rank is >= 3 and # incoming edges is > 0')

@@ -291,7 +291,7 @@ class GlobalStitcher(stitcher.Stitcher):
 
         # 4. create candidate containers
         tmp_graph = nx.union(container, request)
-        for item in candidate_edges.values():
+        for item in list(candidate_edges.values()):
             candidate_graph = copy.deepcopy(tmp_graph)  # faster graph copy
             # candidate_graph = tmp_graph.copy()
             for src, trg in item:

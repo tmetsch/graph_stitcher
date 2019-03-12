@@ -44,16 +44,16 @@ def main(algo):
         stitcher = stitch.GlobalStitcher()
     graphs = stitcher.stitch(container, request, conditions=conditions)
 
-    if len(graphs) > 0:
+    if graphs:
         results = validators.validate_incoming_edges(graphs, {'b': 5})
         # XXX: disable this if you do not want to see the results.
         vis.show(graphs, request, results)
 
 
 if __name__ == '__main__':
-    options = ['global', 'evolutionary', 'bidding']
-    parser = argparse.ArgumentParser()
-    parser.add_argument('-a', choices=options, default='global',
+    OPT = ['global', 'evolutionary', 'bidding']
+    PARSER = argparse.ArgumentParser()
+    PARSER.add_argument('-a', choices=OPT, default='global',
                         help='Select the type of stitching algorithm.')
-    algo = parser.parse_args(sys.argv[1:]).a
-    main(algo)
+    ALGO = PARSER.parse_args(sys.argv[1:]).a
+    main(ALGO)

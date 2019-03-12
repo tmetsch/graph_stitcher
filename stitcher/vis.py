@@ -151,7 +151,7 @@ def _plot_3d_subplot(graph, request, prog, axes):
                 if nghb in tmp.nodes():
                     x_val = pos[nghb][0]
                     y_val = pos[nghb][1]
-                    if (x_val, y_val) in cache.values():
+                    if (x_val, y_val) in list(cache.values()):
                         x_val = pos[nghb][0] + random.randint(10, SPACE)
                         y_val = pos[nghb][0] + random.randint(10, SPACE)
                     cache[item] = (x_val, y_val)

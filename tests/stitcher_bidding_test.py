@@ -144,8 +144,10 @@ class EntityTest(unittest.TestCase):
                              condy)
         self.container.add_node(cut, **self.y_attr)
         res, bids = cut.trigger({'assigned': {}, 'bids': []}, 'init')
-        self.assertEqual(res['c'][1], 1.0)  # 1 (type)
-        self.assertNotIn('b', bids['y'])  # drop other bid.
+        if 'c' in res:
+            self.assertNotIn('b', bids['y'])  # drop other bid.
+        elif 'b' in res:
+            self.assertNotIn('c', bids['y'])  # drop other bid.
 
         # 2. a assigned, b no bid -> increase bid for b (50%)
         self.container = nx.DiGraph()

@@ -4,6 +4,8 @@ Unittest for the basic stitcher.
 
 import json
 import unittest
+import sys
+
 import networkx as nx
 
 from networkx.readwrite import json_graph
@@ -33,6 +35,14 @@ class TestFilteringConditions(unittest.TestCase):
 
         self.cut = stitch.GlobalStitcher()
 
+    def assertItemsEqual(self, first, second):
+        if sys.version_info[0] >= 3:
+            self.assertCountEqual(first, second)
+        else:
+            super(TestFilteringConditions, self).assertItemsEqual(first,
+                                                                  second,
+                                                                  'override.')
+
     def test_filter_for_success(self):
         """
         Test filter for success.
@@ -58,7 +68,7 @@ class TestFilteringConditions(unittest.TestCase):
         condy = {'attributes': [('eq', ('a', ('foo', 'y')))]}
         res1 = self.cut.stitch(self.container, self.request, conditions=condy)
         # only 1 option left - a->2, b->3!
-        self.assertEquals(len(res1), 1)
+        self.assertEqual(len(res1), 1)
         self.assertItemsEqual([('1', '2'), ('a', 'b'), ('2', '3'), ('b', '3'),
                                ('a', '2')], res1[0].edges())
 
@@ -66,7 +76,7 @@ class TestFilteringConditions(unittest.TestCase):
         condy = {'attributes': [('eq', ('a', ('bar', 5)))]}
         res1 = self.cut.stitch(self.container, self.request, conditions=condy)
         # only 1 option left - a->1, b->3!
-        self.assertEquals(len(res1), 1)
+        self.assertEqual(len(res1), 1)
         self.assertItemsEqual([('1', '2'), ('a', 'b'), ('2', '3'), ('b', '3'),
                                ('a', '1')], res1[0].edges())
 
@@ -74,7 +84,7 @@ class TestFilteringConditions(unittest.TestCase):
         condy = {'attributes': [('neq', ('a', ('foo', 'y')))]}
         res1 = self.cut.stitch(self.container, self.request, conditions=condy)
         # only 1 option left - a->1, b->3!
-        self.assertEquals(len(res1), 1)
+        self.assertEqual(len(res1), 1)
         self.assertItemsEqual([('1', '2'), ('a', 'b'), ('2', '3'), ('b', '3'),
                                ('a', '1')], res1[0].edges())
 
@@ -82,7 +92,7 @@ class TestFilteringConditions(unittest.TestCase):
         condy = {'attributes': [('neq', ('a', ('bar', 5)))]}
         res1 = self.cut.stitch(self.container, self.request, conditions=condy)
         # only 1 option left - a->2, b->3!
-        self.assertEquals(len(res1), 1)
+        self.assertEqual(len(res1), 1)
         self.assertItemsEqual([('1', '2'), ('a', 'b'), ('2', '3'), ('b', '3'),
                                ('a', '2')], res1[0].edges())
 
@@ -90,7 +100,7 @@ class TestFilteringConditions(unittest.TestCase):
         condy = {'attributes': [('lg', ('a', ('bar', 5)))]}
         res1 = self.cut.stitch(self.container, self.request, conditions=condy)
         # only 1 option left - a->2, b->3!
-        self.assertEquals(len(res1), 1)
+        self.assertEqual(len(res1), 1)
         self.assertItemsEqual([('1', '2'), ('a', 'b'), ('2', '3'), ('b', '3'),
                                ('a', '2')], res1[0].edges())
 
@@ -98,13 +108,13 @@ class TestFilteringConditions(unittest.TestCase):
         condy = {'attributes': [('lg', ('a', ('xyz', 5)))]}
         res1 = self.cut.stitch(self.container, self.request, conditions=condy)
         # no stitch possible
-        self.assertEquals(len(res1), 0)
+        self.assertEqual(len(res1), 0)
 
         # node a requires target node to have an attribute bar with value < 6
         condy = {'attributes': [('lt', ('a', ('bar', 6)))]}
         res1 = self.cut.stitch(self.container, self.request, conditions=condy)
         # only 1 option left - a->1, b->3!
-        self.assertEquals(len(res1), 1)
+        self.assertEqual(len(res1), 1)
         self.assertItemsEqual([('1', '2'), ('a', 'b'), ('2', '3'), ('b', '3'),
                                ('a', '1')], res1[0].edges())
 
@@ -112,14 +122,14 @@ class TestFilteringConditions(unittest.TestCase):
         condy = {'attributes': [('lt', ('a', ('xyz', 5)))]}
         res1 = self.cut.stitch(self.container, self.request, conditions=condy)
         # no stitch possible
-        self.assertEquals(len(res1), 0)
+        self.assertEqual(len(res1), 0)
 
         # node a requires target node to have an attribute retest which starts
         # with an 'a'
         condy = {'attributes': [('regex', ('a', ('retest', '^a')))]}
         res1 = self.cut.stitch(self.container, self.request, conditions=condy)
         # only 1 option left - a->1, b->3!
-        self.assertEquals(len(res1), 1)
+        self.assertEqual(len(res1), 1)
         self.assertItemsEqual([('1', '2'), ('a', 'b'), ('2', '3'), ('b', '3'),
                                ('a', '1')], res1[0].edges())
 
@@ -128,7 +138,7 @@ class TestFilteringConditions(unittest.TestCase):
         condy = {'attributes': [('regex', ('a', ('retest', '^c')))]}
         res1 = self.cut.stitch(self.container, self.request, conditions=condy)
         # no options left.
-        self.assertEquals(len(res1), 0)
+        self.assertEqual(len(res1), 0)
 
         self.container.add_node('4', **{'type': 'b', 'foo': 'x'})
         self.container.add_edge('3', '4')
@@ -143,8 +153,8 @@ class TestFilteringConditions(unittest.TestCase):
                  'attributes': [('eq', ('a', ('foo', 'x')))]}
         res2 = self.cut.stitch(self.container, self.request, conditions=condy)
         # only 2 options left: b&c->3 or b&c->4
-        self.assertEquals(len(res1), 2)
-        self.assertEquals(len(res2), 2)
+        self.assertEqual(len(res1), 2)
+        self.assertEqual(len(res2), 2)
         # should be identical.
         self.assertItemsEqual(res1[0].edges(), res2[0].edges())
         self.assertItemsEqual(res1[1].edges(), res2[1].edges())
@@ -163,17 +173,33 @@ class TestFilteringConditions(unittest.TestCase):
                  'attributes': [('eq', ('a', ('foo', 'x')))]}
         res2 = self.cut.stitch(self.container, self.request, conditions=condy)
         # only 2 options left: b->3 & c->4 or b->4 & c->3
-        self.assertEquals(len(res1), 2)
-        self.assertEquals(len(res2), 2)
+        self.assertEqual(len(res1), 2)
+        self.assertEqual(len(res2), 2)
         # should be identical.
         self.assertItemsEqual(res1[0].edges(), res2[0].edges())
         self.assertItemsEqual(res1[1].edges(), res2[1].edges())
-        self.assertItemsEqual([('a', '1'), ('a', 'b'), ('b', 'c'), ('1', '2'),
-                               ('3', '4'), ('2', '3'), ('b', '4'), ('c', '3')],
-                              res1[0].edges())
-        self.assertItemsEqual([('a', '1'), ('a', 'b'), ('b', 'c'), ('1', '2'),
-                               ('3', '4'), ('2', '3'), ('b', '3'), ('c', '4')],
-                              res1[1].edges())
+        either_called = False
+        if ('b', '4') in res1[0].edges():
+            self.assertItemsEqual([('a', '1'), ('a', 'b'), ('b', 'c'),
+                                   ('1', '2'), ('3', '4'), ('2', '3'),
+                                   ('b', '4'), ('c', '3')],
+                                  res1[0].edges())
+            self.assertItemsEqual([('a', '1'), ('a', 'b'), ('b', 'c'),
+                                   ('1', '2'), ('3', '4'), ('2', '3'),
+                                   ('b', '3'), ('c', '4')],
+                                  res1[1].edges())
+            either_called = True
+        elif ('b', '4') in res1[1].edges():
+            self.assertItemsEqual([('a', '1'), ('a', 'b'), ('b', 'c'),
+                                   ('1', '2'), ('3', '4'), ('2', '3'),
+                                   ('b', '4'), ('c', '3')],
+                                  res1[1].edges())
+            self.assertItemsEqual([('a', '1'), ('a', 'b'), ('b', 'c'),
+                                   ('1', '2'), ('3', '4'), ('2', '3'),
+                                   ('b', '3'), ('c', '4')],
+                                  res1[0].edges())
+            either_called = True
+        self.assertTrue(either_called)
 
     def test_attr_sharing_filter_for_sanity(self):
         """

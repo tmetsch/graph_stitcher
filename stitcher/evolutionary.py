@@ -380,7 +380,7 @@ class BasicEvolution(object):
 
         # show results
         if iteration >= max_runs:
-            LOG.warn('Maximum number of iterations reached')
+            LOG.warning('Maximum number of iterations reached')
         LOG.info('Final population: %s', repr(population))
         return iteration, population
 
@@ -390,7 +390,7 @@ class EvolutionarySticher(stitcher.Stitcher):
     Stitcher which uses an evolutionary algorithm.
     """
 
-    def __init__(self, filename=None, max_iter=10, fit_goal=1.0, cutoff=0.9,
+    def __init__(self, filename=None, max_iter=10, fit_goal=-1.0, cutoff=0.9,
                  mutate=0.0, candidates=10):
         """
         Initializes this stitcher.
@@ -421,7 +421,7 @@ class EvolutionarySticher(stitcher.Stitcher):
         for _ in range(self.candidates):
             tmp = {}
             for item in request.nodes():
-                trg_cand = random.choice(container.nodes().keys())
+                trg_cand = random.choice(list(container.nodes().keys()))
                 tmp[item] = trg_cand
             population.append(GraphCandidate(tmp, self.rels, conditions, [],
                                              request, container))
@@ -431,7 +431,7 @@ class EvolutionarySticher(stitcher.Stitcher):
                                 fitness_goal=self.fit_goal)
 
         if population[0].fitness() != 0.0:
-            logging.warn('Please rerun - did not find a viable solution')
+            logging.warning('Please rerun - did not find a viable solution')
             return []
 
         graphs = []

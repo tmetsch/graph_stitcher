@@ -62,7 +62,7 @@ def _same_condy(my_bids, param):
     flag = True
     # if I do a bid on all elements in param...
     for item in param:
-        if item not in my_bids.keys():
+        if item not in list(my_bids.keys()):
             flag = False
             break
     # ... I'll increase the bids.
@@ -93,7 +93,8 @@ def _diff_condy(my_bids, param, assigned, all_bids):
             my_bids[item] = my_bids[item] * FACTOR_1
 
     # keep highest bid - remove rest.
-    keeper = max(my_bids, key=lambda k: my_bids[k] if k in param else None)
+    keeper = max(my_bids,
+                 key=lambda k: my_bids[k] if k in param else float('-inf'))
     for item in param:
         if item in my_bids and item != keeper:
             my_bids.pop(item)
@@ -126,7 +127,7 @@ def _sub_stitch(container, request, mapping, condy):
         for src, trg, attr in container.edges(data=True):
             opt_graph.add_edge(tmp[src], tmp[trg], **attr)
 
-        start_node = tmp.values()[0]
+        start_node = list(tmp.values())[0]
 
         # kick off
         assign, _ = start_node.trigger({'bids': [], 'assigned': {}},
@@ -184,7 +185,8 @@ class Entity(object):
             sub_condy['compositions'].remove(condy)
             assign = _sub_stitch(sub_container, sub_request, self.mapping,
                                  sub_condy)
-            if assign.keys() == nodes:
+            # set() so 2,1 == 1,2 in py 3.
+            if set(assign.keys()) == set(nodes):
                 # is complete
                 options[item] = sum([val[1] for val in assign.values()])
                 for tmp in nodes:
@@ -308,7 +310,7 @@ class BiddingStitcher(stitcher.Stitcher):
         for src, trg, attr in container.edges(data=True):
             opt_graph.add_edge(tmp[src], tmp[trg], **attr)
 
-        start_node = tmp.values()[0]
+        start_node = list(tmp.values())[0]
         if start is not None:
             start_node = tmp[start]
 

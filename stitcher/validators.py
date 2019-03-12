@@ -14,7 +14,7 @@ def validate_incoming_edges(graphs, param=None):
     for candidate in graphs:
         res[i] = 'ok'
         for node, values in candidate.nodes(data=True):
-            if values['type'] not in param.keys():
+            if values['type'] not in list(param.keys()):
                 continue
             else:
                 tmp = param[values['type']]
@@ -36,7 +36,7 @@ def validate_incoming_rank(graphs, param=None):
     for candidate in graphs:
         res[i] = 'ok'
         for node, values in candidate.nodes(data=True):
-            if values['type'] not in param.keys():
+            if values['type'] not in list(param.keys()):
                 continue
             else:
                 tmp = param[values['type']]

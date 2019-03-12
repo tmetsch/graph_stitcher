@@ -127,148 +127,148 @@ class TestGraphCandidate(unittest.TestCase):
         # a should not be stitched to 3!
         cut = evolutionary.GraphCandidate({'a': '4'}, self.stitch, {}, [],
                                           self.request, self.container)
-        self.assertEquals(cut.fitness(), 100.0)
+        self.assertEqual(cut.fitness(), 100.0)
 
         # a needs to be stitched to target node with attr foo = 3
         condy = {'attributes': [('eq', ('a', ('foo', 3)))]}
         cut = evolutionary.GraphCandidate({'a': '1'}, self.stitch, condy, [],
                                           self.request, self.container)
-        self.assertEquals(cut.fitness(), 0.0)
+        self.assertEqual(cut.fitness(), 0.0)
 
         cut = evolutionary.GraphCandidate({'a': '2'}, self.stitch, condy, [],
                                           self.request, self.container)
-        self.assertEquals(cut.fitness(), 10.1)
+        self.assertEqual(cut.fitness(), 10.1)
 
         condy = {'attributes': [('eq', ('a', ('foo', 9)))]}
         cut = evolutionary.GraphCandidate({'a': '1'}, self.stitch, condy, [],
                                           self.request, self.container)
-        self.assertEquals(cut.fitness(), 10.2)
+        self.assertEqual(cut.fitness(), 10.2)
 
         # a needs to be stitched to target node with attr foo != 3
         condy = {'attributes': [('neq', ('a', ('foo', 3)))]}
         cut = evolutionary.GraphCandidate({'a': '3'}, self.stitch, condy, [],
                                           self.request, self.container)
-        self.assertEquals(cut.fitness(), 0.0)
+        self.assertEqual(cut.fitness(), 0.0)
 
         cut = evolutionary.GraphCandidate({'a': '2'}, self.stitch, condy, [],
                                           self.request, self.container)
-        self.assertEquals(cut.fitness(), 0.0)
+        self.assertEqual(cut.fitness(), 0.0)
 
         condy = {'attributes': [('neq', ('a', ('foo', 3)))]}
         cut = evolutionary.GraphCandidate({'a': '1'}, self.stitch, condy, [],
                                           self.request, self.container)
-        self.assertEquals(cut.fitness(), 10.1)
+        self.assertEqual(cut.fitness(), 10.1)
 
         # a needs to be stitched to target node with attr foo > 4
         condy = {'attributes': [('lg', ('a', ('foo', 4)))]}
         cut = evolutionary.GraphCandidate({'a': '3'}, self.stitch, condy, [],
                                           self.request, self.container)
-        self.assertEquals(cut.fitness(), 0.0)
+        self.assertEqual(cut.fitness(), 0.0)
 
         cut = evolutionary.GraphCandidate({'a': '2'}, self.stitch, condy, [],
                                           self.request, self.container)
-        self.assertEquals(cut.fitness(), 10.1)
+        self.assertEqual(cut.fitness(), 10.1)
 
         condy = {'attributes': [('lg', ('a', ('foo', 4)))]}
         cut = evolutionary.GraphCandidate({'a': '1'}, self.stitch, condy, [],
                                           self.request, self.container)
-        self.assertEquals(cut.fitness(), 10.2)
+        self.assertEqual(cut.fitness(), 10.2)
 
         # a needs to be stitched to target node with attr foo < 4
         condy = {'attributes': [('lt', ('a', ('foo', 4)))]}
         cut = evolutionary.GraphCandidate({'a': '1'}, self.stitch, condy, [],
                                           self.request, self.container)
-        self.assertEquals(cut.fitness(), 0.0)
+        self.assertEqual(cut.fitness(), 0.0)
 
         cut = evolutionary.GraphCandidate({'a': '2'}, self.stitch, condy, [],
                                           self.request, self.container)
-        self.assertEquals(cut.fitness(), 10.1)
+        self.assertEqual(cut.fitness(), 10.1)
 
         condy = {'attributes': [('lt', ('a', ('foo', 4)))]}
         cut = evolutionary.GraphCandidate({'a': '3'}, self.stitch, condy, [],
                                           self.request, self.container)
-        self.assertEquals(cut.fitness(), 10.2)
+        self.assertEqual(cut.fitness(), 10.2)
 
         # node a requires target node to have an attribute retest which starts
         # with an 'c'
         condy = {'attributes': [('regex', ('a', ('retest', '^b')))]}
         cut = evolutionary.GraphCandidate({'a': '2'}, self.stitch, condy, [],
                                           self.request, self.container)
-        self.assertEquals(cut.fitness(), 10.1)
+        self.assertEqual(cut.fitness(), 10.1)
         cut = evolutionary.GraphCandidate({'a': '1'}, self.stitch, condy, [],
                                           self.request, self.container)
-        self.assertEquals(cut.fitness(), 10.2)
+        self.assertEqual(cut.fitness(), 10.2)
         cut = evolutionary.GraphCandidate({'a': '3'}, self.stitch, condy, [],
                                           self.request, self.container)
-        self.assertEquals(cut.fitness(), 0.0)
+        self.assertEqual(cut.fitness(), 0.0)
 
         # a and b are stitched to 1
         condy = {'compositions': [('share', ('group', ['a', 'b']))]}
         cut = evolutionary.GraphCandidate({'a': '1', 'b': '1'}, self.stitch,
                                           condy, [], self.request,
                                           self.container)
-        self.assertEquals(cut.fitness(), 0.0)
+        self.assertEqual(cut.fitness(), 0.0)
 
         # node c has no group attr.
         cut = evolutionary.GraphCandidate({'a': '1', 'b': '3'}, self.stitch,
                                           condy, [], self.request,
                                           self.container)
-        self.assertEquals(cut.fitness(), 10.1)
+        self.assertEqual(cut.fitness(), 10.1)
 
         # c and d stitched to nodes with different group value.
         condy = {'compositions': [('share', ('group', ['c', 'd']))]}
         cut = evolutionary.GraphCandidate({'c': '4', 'd': '5'}, self.stitch,
                                           condy, [], self.request,
                                           self.container)
-        self.assertEquals(cut.fitness(), 10.2)
+        self.assertEqual(cut.fitness(), 10.2)
 
         # a and b are stitched to 1
         condy = {'compositions': [('nshare', ('group', ['a', 'b']))]}
         cut = evolutionary.GraphCandidate({'a': '1', 'b': '1'}, self.stitch,
                                           condy, [], self.request,
                                           self.container)
-        self.assertEquals(cut.fitness(), 10.2)
+        self.assertEqual(cut.fitness(), 10.2)
 
         # node c has no group attr.
         cut = evolutionary.GraphCandidate({'a': '1', 'b': '3'}, self.stitch,
                                           condy, [], self.request,
                                           self.container)
-        self.assertEquals(cut.fitness(), 10.1)
+        self.assertEqual(cut.fitness(), 10.1)
 
         # c and d stitched to nodes with different group value.
         condy = {'compositions': [('nshare', ('group', ['c', 'd']))]}
         cut = evolutionary.GraphCandidate({'c': '4', 'd': '5'}, self.stitch,
                                           condy, [], self.request,
                                           self.container)
-        self.assertEquals(cut.fitness(), 0.0)
+        self.assertEqual(cut.fitness(), 0.0)
 
         # a and b stitched to same target.
         condy = {'compositions': [('same', ['a', 'b'])]}
         cut = evolutionary.GraphCandidate({'a': '1', 'b': '1'}, self.stitch,
                                           condy, [], self.request,
                                           self.container)
-        self.assertEquals(cut.fitness(), 0.0)
+        self.assertEqual(cut.fitness(), 0.0)
 
         # a and b not stitched to same target.
         condy = {'compositions': [('same', ['b', 'a'])]}
         cut = evolutionary.GraphCandidate({'a': '1', 'b': '2'}, self.stitch,
                                           condy, [], self.request,
                                           self.container)
-        self.assertEquals(cut.fitness(), 10.0)
+        self.assertEqual(cut.fitness(), 10.0)
 
         # a and b not stitched to same target.
         condy = {'compositions': [('diff', ['a', 'b'])]}
         cut = evolutionary.GraphCandidate({'a': '1', 'b': '2'}, self.stitch,
                                           condy, [], self.request,
                                           self.container)
-        self.assertEquals(cut.fitness(), 0.0)
+        self.assertEqual(cut.fitness(), 0.0)
 
         # a and n stitched to same target.
         condy = {'compositions': [('diff', ['b', 'a'])]}
         cut = evolutionary.GraphCandidate({'a': '1', 'b': '1'}, self.stitch,
                                           condy, [], self.request,
                                           self.container)
-        self.assertEquals(cut.fitness(), 10.0)
+        self.assertEqual(cut.fitness(), 10.0)
 
     def test_special(self):
         """
@@ -280,7 +280,7 @@ class TestGraphCandidate(unittest.TestCase):
                                            'c': '5', 'd': '6'},
                                           self.stitch, condy, [], self.request,
                                           self.container)
-        self.assertEquals(cut.fitness(), 0.0)
+        self.assertEqual(cut.fitness(), 0.0)
 
     def test_mutate_for_sanity(self):
         """
@@ -339,10 +339,10 @@ class TestBasicEvolution(unittest.TestCase):
         """
         population = _get_population('x')
         iterations, _ = self.cut.run(population, 100, stabilizer=True)
-        self.assertEquals(iterations, 1)  # should die in second run
+        self.assertEqual(iterations, 1)  # should die in second run
 
         iterations, _ = self.cut.run(population, 0)
-        self.assertEquals(iterations, 1)
+        self.assertEqual(iterations, 1)
 
     def test_run_for_sanity(self):
         """
@@ -350,7 +350,7 @@ class TestBasicEvolution(unittest.TestCase):
         """
         population = _get_population('b')
         iteration, _ = self.cut.run(population, 1)
-        self.assertEquals(iteration, 0)  # done as we flip to b immediately.
+        self.assertEqual(iteration, 0)  # done as we flip to b immediately.
 
 
 class EvolutionaryStitcherTest(unittest.TestCase):

@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python
 
 """
 Sample executor showing the result of the stitching & validation methods.
@@ -11,8 +11,9 @@ import logging
 
 from networkx.readwrite import json_graph
 
-from stitcher import evolutionary
 from stitcher import bidding
+from stitcher import evolutionary
+from stitcher import iterative_repair
 from stitcher import stitch
 from stitcher import validators
 from stitcher import vis
@@ -40,6 +41,10 @@ def main(algo):
         # to show the true power of this :-)
         conditions = {'attributes': [('lt', ('l', ('rank', 9)))]}
         stitcher = bidding.BiddingStitcher()
+    elif algo == 'repair':
+        # to show the true power of this :-)
+        conditions = {'attributes': [('eq', ('k', ('rank', 5)))]}
+        stitcher = iterative_repair.IterativeRepairStitcher()
     else:
         stitcher = stitch.GlobalStitcher()
     graphs = stitcher.stitch(container, request, conditions=conditions)
@@ -51,9 +56,9 @@ def main(algo):
 
 
 if __name__ == '__main__':
-    OPT = ['global', 'evolutionary', 'bidding']
+    OPT = ['global', 'evolutionary', 'bidding', 'repair']
     PARSER = argparse.ArgumentParser()
     PARSER.add_argument('-a', choices=OPT, default='global',
-                        help='Select the type of stitching algorithm.')
+                        help='Select the stitching algorithm.')
     ALGO = PARSER.parse_args(sys.argv[1:]).a
     main(ALGO)

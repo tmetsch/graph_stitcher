@@ -11,6 +11,8 @@ import numpy as np
 
 from mpl_toolkits.mplot3d import Axes3D
 
+import stitcher
+
 SPACE = 25
 TYPE_FORMAT = {'a': '^', 'b': 's', 'c': 'v'}
 
@@ -65,8 +67,8 @@ def _plot_subplot(graph, new_nodes, prog, type_format, axes):
     # draw the nodes
     for node, values in graph.nodes(data=True):
         shape = 'o'
-        if values['type'] in type_format:
-            shape = type_format[values['type']]
+        if values[stitcher.TYPE_ATTR] in type_format:
+            shape = type_format[values[stitcher.TYPE_ATTR]]
         color = 'g'
         alpha = 0.8
         if node in new_nodes:
@@ -106,7 +108,8 @@ def show_3d(graphs, request, titles, prog='neato', filename=None):
     size = _get_size(len(graphs))
 
     for graph in graphs:
-        axes = fig.add_subplot(size[0], size[1], i+1, projection='3d')
+        axes = fig.add_subplot(size[0], size[1], i+1,
+                               projection=Axes3D.name)
         axes.set_title(titles[i])
         axes._axis3don = False
 

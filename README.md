@@ -45,7 +45,7 @@ different algorithms on how to determine if a resulting graph is good
 * (many more .e.g implement your own)
 
 This tool obviously can also be used to enhance the placement of workload after
-a scheduling decision has been made (based on round-robin, preemptive,
+a temporal scheduling decision has been made (based on round-robin, preemptive,
 priority, fair share, fifo, ... algorithms) within clusters.
 
 ## graph stitcher's internals

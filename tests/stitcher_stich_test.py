@@ -36,24 +36,15 @@ class TestFilteringConditions(unittest.TestCase):
         self.cut = stitch.GlobalStitcher()
 
     def assertItemsEqual(self, first, second):
+        """
+        Python2->3 fix...
+        """
         if sys.version_info[0] >= 3:
             self.assertCountEqual(first, second)
         else:
             super(TestFilteringConditions, self).assertItemsEqual(first,
                                                                   second,
                                                                   'override.')
-
-    def test_filter_for_success(self):
-        """
-        Test filter for success.
-        """
-        pass
-
-    def test_filter_for_failure(self):
-        """
-        Test filter for failure.
-        """
-        pass
 
     def test_filter_for_sanity(self):
         """
@@ -266,12 +257,6 @@ class TestGlobalStitcher(unittest.TestCase):
         Test stitch for success.
         """
         self.cut.stitch(self.container, self.request)
-
-    def test_stitch_for_failure(self):
-        """
-        Test stitch for failure.
-        """
-        pass
 
     def test_stitch_for_sanity(self):
         """

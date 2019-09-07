@@ -5,8 +5,10 @@ Module implementing the graph stitcher.
 import json
 import os
 
+TYPE_ATTR = 'type'
 
-class Stitcher(object):
+
+class Stitcher:
     """
     A stitcher.
     """
@@ -18,7 +20,8 @@ class Stitcher(object):
         if filename is None:
             filename = os.path.dirname(os.path.abspath(__file__)) + os.sep + \
                        '..' + os.sep + 'data' + os.sep + 'stitch.json'
-        self.rels = json.load(open(filename, 'r'))
+        with open(filename, 'r') as file_p:
+            self.rels = json.load(file_p)
 
     def stitch(self, container, request, conditions=None):
         """

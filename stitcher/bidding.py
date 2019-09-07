@@ -137,7 +137,7 @@ def _sub_stitch(container, request, mapping, condy):
     return CACHE[(container, request)]
 
 
-class Entity(object):
+class Entity:
     """
     A node in a graph that can bid on nodes of the request graph.
     """
@@ -236,7 +236,8 @@ class Entity(object):
     def _calc_credits(self, assigned):
         tmp = {}
         for node, attr in self.request.nodes(data=True):
-            if self.mapping[attr['type']] == self.container.node[self]['type']:
+            if self.mapping[attr[stitcher.TYPE_ATTR]] == \
+                    self.container.node[self][stitcher.TYPE_ATTR]:
                 tmp[node] = 1.0
         if tmp:
             self.bids[self.name] = self._apply_conditions(tmp, assigned)

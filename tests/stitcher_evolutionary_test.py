@@ -373,18 +373,12 @@ class EvolutionaryStitcherTest(unittest.TestCase):
         """
         self.cut.stitch(self.container, self.request)
 
-    def test_stitch_for_failure(self):
-        """
-        Test stitch for failure.
-        """
-        pass
-
     def test_stitch_for_sanity(self):
         """
         Test stitch for sanity.
         """
         for _ in range(0, 25):
-            # changes are high that within one run the algo fins no solution.
+            # changes are high that within one run the algo finds no solution.
             self.cut.stitch(self.container, self.request)
 
 
@@ -418,7 +412,6 @@ class ExampleCandidate(evolutionary.Candidate):
         """
         Not mutating for stable env.
         """
-        pass
 
     def crossover(self, partner):
         """

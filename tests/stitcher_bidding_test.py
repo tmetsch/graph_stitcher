@@ -48,12 +48,6 @@ class EntityTest(unittest.TestCase):
         self.container.add_node(cut, **self.x_attr)
         cut.trigger({'assigned': {}, 'bids': []}, 'init')
 
-    def test_trigger_for_failure(self):
-        """
-        Test trigger for failure.
-        """
-        pass
-
     def test_trigger_for_sanity(self):
         """
         Test trigger for failure.

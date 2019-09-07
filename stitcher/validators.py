@@ -2,6 +2,8 @@
 contains validation routines.
 """
 
+import stitcher
+
 
 def validate_incoming_edges(graphs, param=None):
     """
@@ -14,10 +16,10 @@ def validate_incoming_edges(graphs, param=None):
     for candidate in graphs:
         res[i] = 'ok'
         for node, values in candidate.nodes(data=True):
-            if values['type'] not in list(param.keys()):
+            if values[stitcher.TYPE_ATTR] not in list(param.keys()):
                 continue
             else:
-                tmp = param[values['type']]
+                tmp = param[values[stitcher.TYPE_ATTR]]
             if len(candidate.in_edges(node)) >= tmp:
                 res[i] = 'node ' + str(node) + ' has to many edges: ' + \
                          str(len(candidate.in_edges(node)))
@@ -36,10 +38,10 @@ def validate_incoming_rank(graphs, param=None):
     for candidate in graphs:
         res[i] = 'ok'
         for node, values in candidate.nodes(data=True):
-            if values['type'] not in list(param.keys()):
+            if values[stitcher.TYPE_ATTR] not in list(param.keys()):
                 continue
             else:
-                tmp = param[values['type']]
+                tmp = param[values[stitcher.TYPE_ATTR]]
             if len(candidate.in_edges(node)) > tmp[0] \
                     and values['rank'] >= tmp[1]:
                 res[i] = 'node ' + str(node) + ' rank is >= ' + \

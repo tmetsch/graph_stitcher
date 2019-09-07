@@ -17,7 +17,7 @@ def _find_nodes(graph, tzpe):
     """
     res = []
     for node, values in graph.nodes(data=True):
-        if values['type'] == tzpe:
+        if values[stitcher.TYPE_ATTR] == tzpe:
             res.append(node)
     return res
 
@@ -38,36 +38,35 @@ def my_filter(container, edge_list, conditions):
     """
     if conditions is None:
         return edge_list
-    else:
-        if 'attributes' in conditions:
-            for condition in conditions['attributes']:
-                cond = condition[0]
-                para1 = condition[1][0]
-                para2 = condition[1][1]
-                if cond == 'eq':
-                    _eq_attr_filter(container, para1, para2, edge_list)
-                elif cond == 'neq':
-                    _neq_attr_filter(container, para1, para2, edge_list)
-                elif cond == 'lg':
-                    _lg_attr_filter(container, para1, para2, edge_list)
-                elif cond == 'lt':
-                    _lt_attr_filter(container, para1, para2, edge_list)
-                elif cond == 'regex':
-                    _regex_attr_filter(container, para1, para2, edge_list)
-        if 'compositions' in conditions:
-            for condition in conditions['compositions']:
-                cond = condition[0]
-                para1 = condition[1][0]
-                para2 = condition[1][1]
-                if cond == 'same':
-                    _same_filter(para1, para2, edge_list)
-                elif cond == 'diff':
-                    _diff_filter(para1, para2, edge_list)
-                elif cond == 'share':
-                    _share_attr(container, para1, para2, edge_list)
-                elif cond == 'nshare':
-                    _nshare_attr(container, para1, para2, edge_list)
-        return edge_list
+    if 'attributes' in conditions:
+        for condition in conditions['attributes']:
+            cond = condition[0]
+            para1 = condition[1][0]
+            para2 = condition[1][1]
+            if cond == 'eq':
+                _eq_attr_filter(container, para1, para2, edge_list)
+            elif cond == 'neq':
+                _neq_attr_filter(container, para1, para2, edge_list)
+            elif cond == 'lg':
+                _lg_attr_filter(container, para1, para2, edge_list)
+            elif cond == 'lt':
+                _lt_attr_filter(container, para1, para2, edge_list)
+            elif cond == 'regex':
+                _regex_attr_filter(container, para1, para2, edge_list)
+    if 'compositions' in conditions:
+        for condition in conditions['compositions']:
+            cond = condition[0]
+            para1 = condition[1][0]
+            para2 = condition[1][1]
+            if cond == 'same':
+                _same_filter(para1, para2, edge_list)
+            elif cond == 'diff':
+                _diff_filter(para1, para2, edge_list)
+            elif cond == 'share':
+                _share_attr(container, para1, para2, edge_list)
+            elif cond == 'nshare':
+                _nshare_attr(container, para1, para2, edge_list)
+    return edge_list
 
 
 def _eq_attr_filter(container, node, condition, candidate_list):
@@ -262,8 +261,9 @@ class GlobalStitcher(stitcher.Stitcher):
         # 1. find possible mappings
         tmp = {}
         for node, attr in request.nodes(data=True):
-            if attr['type'] in self.rels:
-                candidates = _find_nodes(container, self.rels[attr['type']])
+            if attr[stitcher.TYPE_ATTR] in self.rels:
+                candidates = _find_nodes(container,
+                                         self.rels[attr[stitcher.TYPE_ATTR]])
                 for candidate in candidates:
                     if node not in tmp:
                         tmp[node] = [candidate]

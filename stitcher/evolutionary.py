@@ -20,7 +20,7 @@ def _eq_attr(node, attr, gens, container):
     trg_nd = container.node[gens[node]]
     if attr[0] not in trg_nd:
         return 10.1
-    elif attr[1] != trg_nd[attr[0]]:
+    if attr[1] != trg_nd[attr[0]]:
         return 10.2
     return 0.0
 
@@ -44,7 +44,7 @@ def _lg_attr(node, attr, gens, container):
     trg_nd = container.node[gens[node]]
     if attr[0] not in trg_nd:
         return 10.1
-    elif attr[1] >= trg_nd[attr[0]]:
+    if attr[1] >= trg_nd[attr[0]]:
         return 10.2
     return 0.0
 
@@ -57,7 +57,7 @@ def _lt_attr(node, attr, gens, container):
     trg_nd = container.node[gens[node]]
     if attr[0] not in trg_nd:
         return 10.1
-    elif attr[1] < trg_nd[attr[0]]:
+    if attr[1] < trg_nd[attr[0]]:
         return 10.2
     return 0.0
 
@@ -70,7 +70,7 @@ def _regex_attr(node, attr, gens, container):
     trg_nd = container.node[gens[node]]
     if attr[0] not in trg_nd:
         return 10.1
-    elif not re.search(attr[1], trg_nd[attr[0]]):
+    if not re.search(attr[1], trg_nd[attr[0]]):
         return 10.2
     return 0.0
 
@@ -112,7 +112,7 @@ def _share_attr(attrn, node_list, gens, container):
         trg = gens[node]
         if attrn not in container.node[trg]:
             return 10.1
-        elif attrv is None:
+        if attrv is None:
             attrv = container.node[trg][attrn]
         elif attrv != container.node[trg][attrn]:
             return 10.2
@@ -130,7 +130,7 @@ def _nshare_attr(attrn, node_list, gens, container):
         trg = gens[node]
         if attrn not in container.node[trg]:
             return 10.1
-        elif attrv is None:
+        if attrv is None:
             attrv = container.node[trg][attrn]
         elif attrv == container.node[trg][attrn]:
             return 10.2
@@ -172,7 +172,7 @@ def _my_filter(conditions, gens, container):
     return res
 
 
-class Candidate(object):
+class Candidate:
     """
     A candidate of a population for an evolutionary algorithm
     """
@@ -229,8 +229,8 @@ class GraphCandidate(Candidate):
         # 1. stitch
         for src in self.gen:
             trg = self.gen[src]
-            if self.container.node[trg]['type'] != \
-                    self.stitch[self.request.node[src]['type']]:
+            if self.container.node[trg][stitcher.TYPE_ATTR] != \
+                    self.stitch[self.request.node[src][stitcher.TYPE_ATTR]]:
                 fit += 100
 
         # 2. conditions
@@ -249,8 +249,8 @@ class GraphCandidate(Candidate):
             # break off as there might be no other match available.
             nd_trg = self.mutation_list[random.randint(
                 0, len(self.mutation_list) - 1)][0]
-            if self.container.node[nd_trg]['type'] == \
-                    self.stitch[self.request.node[src]['type']]:
+            if self.container.node[nd_trg][stitcher.TYPE_ATTR] == \
+                    self.stitch[self.request.node[src][stitcher.TYPE_ATTR]]:
                 done = True
                 self.gen[src] = nd_trg
             i += 1
@@ -266,8 +266,8 @@ class GraphCandidate(Candidate):
             i = 0
             while not done and i <= cutoff:
                 nd_trg = random.choice(list(partner.gen.values()))
-                if self.container.node[nd_trg]['type'] \
-                        == self.stitch[self.request.node[src]['type']]:
+                if self.container.node[nd_trg][stitcher.TYPE_ATTR] == \
+                        self.stitch[self.request.node[src][stitcher.TYPE_ATTR]]:
                     done = True
                 i += 1
             if done:
@@ -282,7 +282,7 @@ class GraphCandidate(Candidate):
         return 'f: ' + str(self.fitness()) + ' - ' + repr(self.gen)
 
 
-class BasicEvolution(object):
+class BasicEvolution:
     """
     Implements basic evolutionary behaviour.
     """

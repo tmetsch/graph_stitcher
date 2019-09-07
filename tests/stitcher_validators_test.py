@@ -32,12 +32,6 @@ class TestIncomingEdgeStitcher(unittest.TestCase):
         res1 = self.stitcher.stitch(self.container, self.request)
         validators.validate_incoming_edges(res1)
 
-    def test_validate_for_failure(self):
-        """
-        Test validate for failure.
-        """
-        pass
-
     def test_validate_for_sanity(self):
         """
         Test validate for sanity.
@@ -74,12 +68,6 @@ class TestNodeRankSticher(unittest.TestCase):
         """
         res1 = self.stitcher.stitch(self.container, self.request)
         validators.validate_incoming_rank(res1)
-
-    def test_validate_for_failure(self):
-        """
-        Test validate for failure.
-        """
-        pass
 
     def test_validate_for_sanity(self):
         """

@@ -390,7 +390,7 @@ class EvolutionarySticher(stitcher.Stitcher):
     Stitcher which uses an evolutionary algorithm.
     """
 
-    def __init__(self, filename=None, max_iter=10, fit_goal=-1.0, cutoff=0.9,
+    def __init__(self, rels, max_iter=10, fit_goal=-1.0, cutoff=0.9,
                  mutate=0.0, candidates=10):
         """
         Initializes this stitcher.
@@ -404,7 +404,7 @@ class EvolutionarySticher(stitcher.Stitcher):
         :param candidates: Number of candidates to randomly generate
             (default 10).
         """
-        super(EvolutionarySticher, self).__init__(filename=filename)
+        super(EvolutionarySticher, self).__init__(rels)
         self.max_iter = max_iter
         self.fit_goal = fit_goal
         self.cutoff = cutoff

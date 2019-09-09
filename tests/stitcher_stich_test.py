@@ -33,7 +33,7 @@ class TestFilteringConditions(unittest.TestCase):
         self.request.add_node('b', **{'type': 'y'})
         self.request.add_edge('a', 'b')
 
-        self.cut = stitch.GlobalStitcher()
+        self.cut = stitch.GlobalStitcher({'x': 'a', 'y': 'b', 'z': 'c'})
 
     def assertItemsEqual(self, first, second):
         """
@@ -250,7 +250,8 @@ class TestGlobalStitcher(unittest.TestCase):
         request_tmp = json.load(open('data/request.json'))
         self.request = json_graph.node_link_graph(request_tmp,
                                                   directed=True)
-        self.cut = stitch.GlobalStitcher()
+        rels = json.load(open('data/stitch.json'))
+        self.cut = stitch.GlobalStitcher(rels)
 
     def test_stitch_for_success(self):
         """

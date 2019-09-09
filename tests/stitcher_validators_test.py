@@ -23,7 +23,8 @@ class TestIncomingEdgeStitcher(unittest.TestCase):
         request_tmp = json.load(open('data/request.json'))
         self.request = json_graph.node_link_graph(request_tmp,
                                                   directed=True)
-        self.stitcher = stitch.GlobalStitcher()
+        rels = json.load(open('data/stitch.json'))
+        self.stitcher = stitch.GlobalStitcher(rels)
 
     def test_validate_for_success(self):
         """
@@ -60,7 +61,8 @@ class TestNodeRankSticher(unittest.TestCase):
         request_tmp = json.load(open('data/request.json'))
         self.request = json_graph.node_link_graph(request_tmp,
                                                   directed=True)
-        self.stitcher = stitch.GlobalStitcher()
+        rels = json.load(open('data/stitch.json'))
+        self.stitcher = stitch.GlobalStitcher(rels)
 
     def test_validate_for_success(self):
         """

@@ -41,7 +41,8 @@ class IterativeRepairStitcherTest(unittest.TestCase):
         request_tmp = json.load(open('data/request.json'))
         self.request = json_graph.node_link_graph(request_tmp,
                                                   directed=True)
-        self.cut = iterative_repair.IterativeRepairStitcher()
+        rels = json.load(open('data/stitch.json'))
+        self.cut = iterative_repair.IterativeRepairStitcher(rels)
 
     # Test for success.
 

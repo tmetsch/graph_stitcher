@@ -365,7 +365,8 @@ class EvolutionaryStitcherTest(unittest.TestCase):
         request_tmp = json.load(open('data/request.json'))
         self.request = json_graph.node_link_graph(request_tmp,
                                                   directed=True)
-        self.cut = evolutionary.EvolutionarySticher()
+        rels = json.load(open('data/stitch.json'))
+        self.cut = evolutionary.EvolutionarySticher(rels)
 
     def test_stitch_for_success(self):
         """

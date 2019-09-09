@@ -31,22 +31,23 @@ def main(algo):
     container = json_graph.node_link_graph(container_tmp, directed=True)
     request_tmp = json.load(open('data/request.json'))
     request = json_graph.node_link_graph(request_tmp, directed=True)
+    rels = json.load(open('data/stitch.json'))
     conditions = {}
 
     if algo == 'evolutionary':
         # to show the true power of this :-)
         conditions = {'compositions': [('diff', ('k', 'l'))]}
-        stitcher = evolutionary.EvolutionarySticher()
+        stitcher = evolutionary.EvolutionarySticher(rels)
     elif algo == 'bidding':
         # to show the true power of this :-)
         conditions = {'attributes': [('lt', ('l', ('rank', 9)))]}
-        stitcher = bidding.BiddingStitcher()
+        stitcher = bidding.BiddingStitcher(rels)
     elif algo == 'repair':
         # to show the true power of this :-)
         conditions = {'attributes': [('eq', ('k', ('rank', 5)))]}
-        stitcher = iterative_repair.IterativeRepairStitcher()
+        stitcher = iterative_repair.IterativeRepairStitcher(rels)
     else:
-        stitcher = stitch.GlobalStitcher()
+        stitcher = stitch.GlobalStitcher(rels)
     graphs = stitcher.stitch(container, request, conditions=conditions)
 
     if graphs:

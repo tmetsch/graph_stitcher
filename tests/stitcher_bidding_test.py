@@ -218,10 +218,10 @@ class BiddingStitcherTest(unittest.TestCase):
     """
 
     def setUp(self):
-        self.cut = bidding.BiddingStitcher()
-        self.cut.rels = {'type_x': 'type_a',
-                         'type_y': 'type_b',
-                         'type_z': 'type_c'}
+        rels = {'type_x': 'type_a',
+                'type_y': 'type_b',
+                'type_z': 'type_c'}
+        self.cut = bidding.BiddingStitcher(rels)
 
         self.container = nx.DiGraph()
         self.container.add_node('A', **{'type': 'type_a'})

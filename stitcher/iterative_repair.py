@@ -59,8 +59,8 @@ class IterativeRepairStitcher(stitcher.Stitcher):
     Stitcher using a iterative repair approach to solve the constraints.
     """
 
-    def __init__(self, max_steps=30, filename=None):
-        super(IterativeRepairStitcher, self).__init__(filename=filename)
+    def __init__(self, rels, max_steps=30):
+        super(IterativeRepairStitcher, self).__init__(rels)
         self.steps = max_steps
 
     def stitch(self, container, request, conditions=None):

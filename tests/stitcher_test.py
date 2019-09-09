@@ -13,7 +13,7 @@ class StitcherTest(unittest.TestCase):
     """
 
     def setUp(self):
-        self.cut = stitcher.Stitcher()
+        self.cut = stitcher.Stitcher({'a': 'b'})
 
     def test_stitch_for_failure(self):
         """

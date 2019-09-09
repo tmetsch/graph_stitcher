@@ -2,9 +2,6 @@
 Module implementing the graph stitcher.
 """
 
-import json
-import os
-
 TYPE_ATTR = 'type'
 
 
@@ -13,15 +10,14 @@ class Stitcher:
     A stitcher.
     """
 
-    def __init__(self, filename=None):
+    def __init__(self, rels):
         """
         Initiate the stitcher.
+
+        ;:param rels: A dictionary defining what type of nodes in the request
+            must be stitched to what type of nodes in the container.
         """
-        if filename is None:
-            filename = os.path.dirname(os.path.abspath(__file__)) + os.sep + \
-                       '..' + os.sep + 'data' + os.sep + 'stitch.json'
-        with open(filename, 'r') as file_p:
-            self.rels = json.load(file_p)
+        self.rels = rels
 
     def stitch(self, container, request, conditions=None):
         """

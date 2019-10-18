@@ -106,10 +106,10 @@ def _nshare_condy(my_bids, param, assigned, node, container):
     nodes = param[1]
     for item in nodes:
         if item in assigned and attrv_assigned is None:
-            tmp = [n for n in container.nodes() if n.name == assigned[item][0]]
-            attrv_assigned = container.node[tmp[0]][attrn]
+            tmp = [n for n in container.nodes if n.name == assigned[item][0]]
+            attrv_assigned = container.nodes[tmp[0]][attrn]
         elif attrv_assigned is not None and item in my_bids \
-                and container.node[node][attrn] != attrv_assigned:
+                and container.nodes[node][attrn] != attrv_assigned:
             my_bids[item] = my_bids[item] * FACTOR_2
 
 
@@ -157,20 +157,20 @@ class Entity:
         """
         attrn = param[0]
         nodes = param[1]
-        if attrn not in self.container.node[self]:
+        if attrn not in self.container.nodes[self]:
             for item in nodes:
                 if item in my_bids:
                     my_bids.pop(item)
             return []
-        my_attrv = self.container.node[self][attrn]
+        my_attrv = self.container.nodes[self][attrn]
         bids = self.bids
 
         cache = {}
         # step 1) find possible groups that I know of.
         for item in bids:
             tmp = [n for n in self.container.nodes() if n.name == item][0]
-            if attrn in self.container.node[tmp]:
-                attrv = self.container.node[tmp][attrn]
+            if attrn in self.container.nodes[tmp]:
+                attrv = self.container.nodes[tmp][attrn]
                 if attrv not in cache:
                     cache[attrv] = [tmp]
                 else:
@@ -215,7 +215,7 @@ class Entity:
             for item in self.conditions['attributes']:
                 condy = item[0]
                 param = item[1]
-                node_attr = self.container.node[self]
+                node_attr = self.container.nodes[self]
                 _attribute_condy(condy, my_bids, param, node_attr)
         if 'compositions' in self.conditions:
             for item in self.conditions['compositions']:
@@ -237,7 +237,7 @@ class Entity:
         tmp = {}
         for node, attr in self.request.nodes(data=True):
             if self.mapping[attr[stitcher.TYPE_ATTR]] == \
-                    self.container.node[self][stitcher.TYPE_ATTR]:
+                    self.container.nodes[self][stitcher.TYPE_ATTR]:
                 tmp[node] = 1.0
         if tmp:
             self.bids[self.name] = self._apply_conditions(tmp, assigned)

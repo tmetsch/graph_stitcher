@@ -137,7 +137,7 @@ class IterativeRepairStitcher(stitcher.Stitcher):
         """
         # TODO: write solving routines for conditions that are available.
         tmp = self._pick_random(container,
-                                request.node[conflict[0]][stitcher.TYPE_ATTR])
+                                request.nodes[conflict[0]][stitcher.TYPE_ATTR])
         mapping[conflict[0]] = tmp
 
     def _pick_random(self, container, req_node_type):
@@ -170,25 +170,25 @@ def _check_attributes(node, condy, container, mapping):
     attrs = condy[1]
     # attributes
     if cond == 'eq':
-        if attrs[0] not in container.node[mapping[node]] or \
-                container.node[mapping[node]][attrs[0]] != attrs[1]:
+        if attrs[0] not in container.nodes[mapping[node]] or \
+                container.nodes[mapping[node]][attrs[0]] != attrs[1]:
             return node, condy
     elif cond == 'neq':
-        if attrs[0] in container.node[mapping[node]] and \
-                container.node[mapping[node]][attrs[0]] == attrs[1]:
+        if attrs[0] in container.nodes[mapping[node]] and \
+                container.nodes[mapping[node]][attrs[0]] == attrs[1]:
             return node, condy
     elif cond == 'lt':
-        if attrs[0] not in container.node[mapping[node]] or \
-                container.node[mapping[node]][attrs[0]] > attrs[1]:
+        if attrs[0] not in container.nodes[mapping[node]] or \
+                container.nodes[mapping[node]][attrs[0]] > attrs[1]:
             return node, condy
     elif cond == 'gt':
-        if attrs[0] not in container.node[mapping[node]] or \
-                container.node[mapping[node]][attrs[0]] < attrs[1]:
+        if attrs[0] not in container.nodes[mapping[node]] or \
+                container.nodes[mapping[node]][attrs[0]] < attrs[1]:
             return node, condy
     elif cond == 'regex':
-        if attrs[0] not in container.node[mapping[node]] or \
+        if attrs[0] not in container.nodes[mapping[node]] or \
                 not re.search(attrs[1],
-                              container.node[mapping[node]][attrs[0]]):
+                              container.nodes[mapping[node]][attrs[0]]):
             return node, condy
     return None
 
@@ -206,15 +206,15 @@ def _check_compositions(node, condy, container, mapping):
     elif cond == 'share':
         attr_name = attrs[0]
         for ngbh in attrs[1]:
-            if attr_name not in container.node[mapping[ngbh]] or \
-                    container.node[mapping[ngbh]][attr_name] != \
-                    container.node[mapping[node]][attr_name]:
+            if attr_name not in container.nodes[mapping[ngbh]] or \
+                    container.nodes[mapping[ngbh]][attr_name] != \
+                    container.nodes[mapping[node]][attr_name]:
                 return node, condy
     elif cond == 'nshare':
         attr_name = attrs[0]
         for ngbh in attrs[1]:
-            if attr_name not in container.node[mapping[ngbh]] or \
-                    container.node[mapping[ngbh]][attr_name] == \
-                    container.node[mapping[node]][attr_name]:
+            if attr_name not in container.nodes[mapping[ngbh]] or \
+                    container.nodes[mapping[ngbh]][attr_name] == \
+                    container.nodes[mapping[node]][attr_name]:
                 return node, condy
     return None

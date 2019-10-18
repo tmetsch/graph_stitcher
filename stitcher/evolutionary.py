@@ -17,7 +17,7 @@ def _eq_attr(node, attr, gens, container):
     Calcs fitness based on the fact that node need target node to have an attr
     with a certain value.
     """
-    trg_nd = container.node[gens[node]]
+    trg_nd = container.nodes[gens[node]]
     if attr[0] not in trg_nd:
         return 10.1
     if attr[1] != trg_nd[attr[0]]:
@@ -30,7 +30,7 @@ def _neq_attr(node, attr, gens, container):
     Calcs fitness based on the fact that node's target shall not have an attr
     with a certain value.
     """
-    trg_nd = container.node[gens[node]]
+    trg_nd = container.nodes[gens[node]]
     if attr[0] in trg_nd and attr[1] == trg_nd[attr[0]]:
         return 10.1
     return 0.0
@@ -41,7 +41,7 @@ def _lg_attr(node, attr, gens, container):
     Calcs fitness based on the fact that node's target node shall have an attr
     with a value larger than the given one.
     """
-    trg_nd = container.node[gens[node]]
+    trg_nd = container.nodes[gens[node]]
     if attr[0] not in trg_nd:
         return 10.1
     if attr[1] >= trg_nd[attr[0]]:
@@ -54,7 +54,7 @@ def _lt_attr(node, attr, gens, container):
     Calcs fitness based on the fact that node's target node shall have an attr
     with a value smaller than the given one.
     """
-    trg_nd = container.node[gens[node]]
+    trg_nd = container.nodes[gens[node]]
     if attr[0] not in trg_nd:
         return 10.1
     if attr[1] < trg_nd[attr[0]]:
@@ -67,7 +67,7 @@ def _regex_attr(node, attr, gens, container):
     Calcs fitness based on the fact that node's target node shall have an attr
     with a value smaller than the given one.
     """
-    trg_nd = container.node[gens[node]]
+    trg_nd = container.nodes[gens[node]]
     if attr[0] not in trg_nd:
         return 10.1
     if not re.search(attr[1], trg_nd[attr[0]]):
@@ -110,11 +110,11 @@ def _share_attr(attrn, node_list, gens, container):
     attrv = None
     for node in node_list:
         trg = gens[node]
-        if attrn not in container.node[trg]:
+        if attrn not in container.nodes[trg]:
             return 10.1
         if attrv is None:
-            attrv = container.node[trg][attrn]
-        elif attrv != container.node[trg][attrn]:
+            attrv = container.nodes[trg][attrn]
+        elif attrv != container.nodes[trg][attrn]:
             return 10.2
     return 0.0
 
@@ -128,11 +128,11 @@ def _nshare_attr(attrn, node_list, gens, container):
     attrv = None
     for node in node_list:
         trg = gens[node]
-        if attrn not in container.node[trg]:
+        if attrn not in container.nodes[trg]:
             return 10.1
         if attrv is None:
-            attrv = container.node[trg][attrn]
-        elif attrv == container.node[trg][attrn]:
+            attrv = container.nodes[trg][attrn]
+        elif attrv == container.nodes[trg][attrn]:
             return 10.2
     return 0.0
 
@@ -229,8 +229,8 @@ class GraphCandidate(Candidate):
         # 1. stitch
         for src in self.gen:
             trg = self.gen[src]
-            if self.container.node[trg][stitcher.TYPE_ATTR] != \
-                    self.stitch[self.request.node[src][stitcher.TYPE_ATTR]]:
+            if self.container.nodes[trg][stitcher.TYPE_ATTR] != \
+                    self.stitch[self.request.nodes[src][stitcher.TYPE_ATTR]]:
                 fit += 100
 
         # 2. conditions
@@ -249,8 +249,8 @@ class GraphCandidate(Candidate):
             # break off as there might be no other match available.
             nd_trg = self.mutation_list[random.randint(
                 0, len(self.mutation_list) - 1)][0]
-            if self.container.node[nd_trg][stitcher.TYPE_ATTR] == \
-                    self.stitch[self.request.node[src][stitcher.TYPE_ATTR]]:
+            if self.container.nodes[nd_trg][stitcher.TYPE_ATTR] == \
+                    self.stitch[self.request.nodes[src][stitcher.TYPE_ATTR]]:
                 done = True
                 self.gen[src] = nd_trg
             i += 1
@@ -266,8 +266,9 @@ class GraphCandidate(Candidate):
             i = 0
             while not done and i <= cutoff:
                 nd_trg = random.choice(list(partner.gen.values()))
-                if self.container.node[nd_trg][stitcher.TYPE_ATTR] == \
-                        self.stitch[self.request.node[src][stitcher.TYPE_ATTR]]:
+                if self.container.nodes[nd_trg][stitcher.TYPE_ATTR] == \
+                        self.stitch[self.request.nodes[src][
+                                stitcher.TYPE_ATTR]]:
                     done = True
                 i += 1
             if done:

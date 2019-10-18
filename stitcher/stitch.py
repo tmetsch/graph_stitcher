@@ -77,11 +77,11 @@ def _eq_attr_filter(container, node, condition, candidate_list):
         attrn = condition[0]
         attrv = condition[1]
         for src, trg in candidate_list[candidate]:
-            if src == node and attrn not in container.node[trg]:
+            if src == node and attrn not in container.nodes[trg]:
                 candidate_list.pop(candidate)
                 break
-            if src == node and attrn in container.node[trg] \
-                    and attrv != container.node[trg][attrn]:
+            if src == node and attrn in container.nodes[trg] \
+                    and attrv != container.nodes[trg][attrn]:
                 candidate_list.pop(candidate)
                 break
 
@@ -94,8 +94,8 @@ def _neq_attr_filter(container, node, condition, candidate_list):
         attrn = condition[0]
         attrv = condition[1]
         for src, trg in candidate_list[candidate]:
-            if src == node and attrn in container.node[trg] \
-                    and attrv == container.node[trg][attrn]:
+            if src == node and attrn in container.nodes[trg] \
+                    and attrv == container.nodes[trg][attrn]:
                 candidate_list.pop(candidate)
                 break
 
@@ -108,11 +108,11 @@ def _lg_attr_filter(container, node, condition, candidate_list):
         attrn = condition[0]
         attrv = condition[1]
         for src, trg in candidate_list[candidate]:
-            if src == node and attrn not in container.node[trg]:
+            if src == node and attrn not in container.nodes[trg]:
                 candidate_list.pop(candidate)
                 break
-            if src == node and attrn in container.node[trg] \
-                    and container.node[trg][attrn] <= attrv:
+            if src == node and attrn in container.nodes[trg] \
+                    and container.nodes[trg][attrn] <= attrv:
                 candidate_list.pop(candidate)
                 break
 
@@ -125,11 +125,11 @@ def _lt_attr_filter(container, node, condition, candidate_list):
         attrn = condition[0]
         attrv = condition[1]
         for src, trg in candidate_list[candidate]:
-            if src == node and attrn not in container.node[trg]:
+            if src == node and attrn not in container.nodes[trg]:
                 candidate_list.pop(candidate)
                 break
-            if src == node and attrn in container.node[trg] \
-                    and attrv < container.node[trg][attrn]:
+            if src == node and attrn in container.nodes[trg] \
+                    and attrv < container.nodes[trg][attrn]:
                 candidate_list.pop(candidate)
                 break
 
@@ -142,11 +142,11 @@ def _regex_attr_filter(container, node, condition, candidate_list):
         attrn = condition[0]
         regex = condition[1]
         for src, trg in candidate_list[candidate]:
-            if src == node and attrn not in container.node[trg]:
+            if src == node and attrn not in container.nodes[trg]:
                 candidate_list.pop(candidate)
                 break
-            if src == node and attrn in container.node[trg] \
-                    and not re.search(regex, container.node[trg][attrn]):
+            if src == node and attrn in container.nodes[trg] \
+                    and not re.search(regex, container.nodes[trg][attrn]):
                 candidate_list.pop(candidate)
                 break
 
@@ -206,12 +206,12 @@ def _share_attr(container, attrn, nlist, candidate_list):
     for candidate in list(candidate_list.keys()):
         attrv = ''
         for src, trg in candidate_list[candidate]:
-            if attrn not in container.node[trg]:
+            if attrn not in container.nodes[trg]:
                 candidate_list.pop(candidate)
                 break
             elif src in nlist and attrv == '':
-                attrv = container.node[trg][attrn]
-            elif src in nlist and container.node[trg][attrn] != attrv:
+                attrv = container.nodes[trg][attrn]
+            elif src in nlist and container.nodes[trg][attrn] != attrv:
                 candidate_list.pop(candidate)
                 break
 
@@ -225,12 +225,12 @@ def _nshare_attr(container, attrn, nlist, candidate_list):
     for candidate in list(candidate_list.keys()):
         attrv = ''
         for src, trg in candidate_list[candidate]:
-            if attrn not in container.node[trg]:
+            if attrn not in container.nodes[trg]:
                 candidate_list.pop(candidate)
                 break
             elif src in nlist and attrv == '':
-                attrv = container.node[trg][attrn]
-            elif src in nlist and container.node[trg][attrn] == attrv:
+                attrv = container.nodes[trg][attrn]
+            elif src in nlist and container.nodes[trg][attrn] == attrv:
                 candidate_list.pop(candidate)
                 break
 

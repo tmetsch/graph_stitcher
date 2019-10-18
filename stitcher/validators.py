@@ -18,8 +18,7 @@ def validate_incoming_edges(graphs, param=None):
         for node, values in candidate.nodes(data=True):
             if values[stitcher.TYPE_ATTR] not in list(param.keys()):
                 continue
-            else:
-                tmp = param[values[stitcher.TYPE_ATTR]]
+            tmp = param[values[stitcher.TYPE_ATTR]]
             if len(candidate.in_edges(node)) >= tmp:
                 res[i] = 'node ' + str(node) + ' has to many edges: ' + \
                          str(len(candidate.in_edges(node)))
@@ -40,8 +39,7 @@ def validate_incoming_rank(graphs, param=None):
         for node, values in candidate.nodes(data=True):
             if values[stitcher.TYPE_ATTR] not in list(param.keys()):
                 continue
-            else:
-                tmp = param[values[stitcher.TYPE_ATTR]]
+            tmp = param[values[stitcher.TYPE_ATTR]]
             if len(candidate.in_edges(node)) > tmp[0] \
                     and values['rank'] >= tmp[1]:
                 res[i] = 'node ' + str(node) + ' rank is >= ' + \
